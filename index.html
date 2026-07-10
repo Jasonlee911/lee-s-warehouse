@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRO 产品路线图追踪器</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #F7F6F3; color: #2C2B28; min-height: 100vh; }
+  .app { max-width: 1200px; margin: 0 auto; padding: 24px 20px 48px; }
+  .header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; gap: 12px; flex-wrap: wrap; }
+  .header-left h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; color: #1A1918; outline: none; border-radius: 6px; padding: 2px 6px; margin: -2px -6px; transition: background 0.15s; cursor: text; }
+  .header-left h1:hover { background: #EEEDE9; }
+  .header-left h1:focus { background: #EEEDE9; border-bottom: 2px dashed #5B4EE8; }
+  .header-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .summary-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+  .chip-done { background: #D6F0E0; color: #176B3A; }
+  .chip-wip  { background: #FFF0CC; color: #7A5100; }
+  .chip-todo { background: #E8E7E3; color: #4A4945; }
+  .chip-risk { background: #FDDDD8; color: #9B2315; }
+  .btn { background: #5B4EE8; color: white; border: none; border-radius: 8px; padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.15s; white-space: nowrap; }
+  .btn:hover { background: #4A3DD0; }
+  .btn-outline { background: white; color: #5B4EE8; border: 1.5px solid #5B4EE8; border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
+  .btn-outline:hover { background: #F0EEFF; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; border-radius: 6px; }
+  .btn-danger { background: #F04A30; }
+  .btn-danger:hover { background: #D93A20; }
+  .btn-icon { background: none; border: none; cursor: pointer; font-size: 16px; padding: 6px 8px; border-radius: 6px; color: #7C7B77; transition: background 0.15s; }
+  .btn-icon:hover { background: #EEEDE9; }
+  .sync-bar { display: flex; align-items: center; gap: 10px; background: white; border: 1.5px solid #E8E7E3; border-radius: 10px; padding: 8px 14px; margin-bottom: 14px; font-size: 12px; flex-wrap: wrap; }
+  .sync-status { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .sync-dot.ok    { background: #33C06A; }
+  .sync-dot.warn  { background: #F5A623; }
+  .sync-dot.error { background: #F04A30; }
+  .sync-dot.saving { background: #5B4EE8; animation: pulse 0.8s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .sync-time { color: #A0A09A; margin-left: auto; }
+  .token-setup { background: #F0EEFF; border: 1.5px solid #C5BDFF; border-radius: 10px; padding: 14px 18px; margin-bottom: 14px; }
+  .token-setup h3 { font-size: 13px; font-weight: 700; color: #3D30C4; margin-bottom: 8px; }
+  .token-setup p { font-size: 12px; color: #5B4EE8; margin-bottom: 10px; line-height: 1.5; }
+  .token-input-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .token-input { flex: 1; min-width: 200px; border: 1.5px solid #C5BDFF; border-radius: 7px; padding: 7px 10px; font-size: 13px; font-family: monospace; background: white; outline: none; }
+  .token-input:focus { border-color: #5B4EE8; }
+  .timeline-controls { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .timeline-controls label { font-size: 12px; font-weight: 600; color: #7C7B77; }
+  .timeline-controls input { width: 60px; padding: 4px 6px; border: 1.5px solid #E8E7E3; border-radius: 6px; font-size: 12px; font-family: inherit; text-align: center; }
+  .timeline-controls input:focus { border-color: #5B4EE8; outline: none; }
+  .timeline-wrap { position: relative; padding: 0 0 4px; overflow-x: auto; }
+  .timeline-axis { display: flex; border-top: 2px solid #2C2B28; margin-bottom: 0; min-width: fit-content; }
+  .month-col { flex: 1; min-width: 120px; position: relative; }
+  .month-label { font-size: 13px; font-weight: 700; color: #2C2B28; padding: 8px 0 0; }
+  .month-dot { width: 8px; height: 8px; background: #2C2B28; border-radius: 50%; position: absolute; top: -5px; left: 0; }
+  .task-card { background: white; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; cursor: grab; border: 1.5px solid transparent; transition: box-shadow 0.15s, transform 0.1s; position: relative; user-select: none; }
+  .task-card:active { cursor: grabbing; }
+  .task-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10); transform: translateY(-1px); }
+  .task-card.active { border-color: #5B4EE8; box-shadow: 0 0 0 3px rgba(91,78,232,0.12); }
+  .task-card.dragging { opacity: 0.5; transform: scale(0.95); }
+  .task-card.drag-over { border-color: #5B4EE8; background: #F8F7FF; border-style: dashed; }
+  .card-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 5px; }
+  .card-title { font-size: 13px; font-weight: 600; color: #1A1918; line-height: 1.35; }
+  .card-sub { font-size: 11px; color: #7C7B77; margin-top: 3px; line-height: 1.4; }
+  .card-notes { font-size: 10px; color: #A0A09A; margin-top: 5px; line-height: 1.4; font-style: italic; }
+  .card-actions { position: absolute; top: 6px; right: 8px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s; }
+  .task-card:hover .card-actions { opacity: 1; }
+  .card-actions button { background: none; border: none; cursor: pointer; font-size: 14px; padding: 2px 4px; border-radius: 4px; color: #7C7B77; }
+  .card-actions button:hover { background: #EEEDE9; color: #F04A30; }
+  .progress-wrap { margin-top: 8px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 10px; color: #7C7B77; margin-bottom: 3px; }
+  .progress-bar { height: 5px; background: #EEEDE9; border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 99px; transition: width 0.3s; }
+  .s-done .card-tag { color: #176B3A; } .s-done { border-left: 3px solid #33C06A; } .s-done .progress-fill { background: #33C06A; }
+  .s-wip  .card-tag { color: #7A5100; } .s-wip  { border-left: 3px solid #F5A623; } .s-wip  .progress-fill { background: #F5A623; }
+  .s-todo .card-tag { color: #4A4945; } .s-todo { border-left: 3px solid #B5B4AF; } .s-todo .progress-fill { background: #B5B4AF; }
+  .s-risk .card-tag { color: #9B2315; } .s-risk { border-left: 3px solid #F04A30; } .s-risk .progress-fill { background: #F04A30; }
+  .risk-icon { display: inline-block; margin-left: 4px; color: #F04A30; font-size: 12px; }
+  .grid-wrap { display: grid; gap: 0; margin-top: 16px; }
+  .col-header { font-size: 11px; font-weight: 700; color: #9C9A93; text-transform: uppercase; letter-spacing: 0.8px; padding: 0 6px 10px; border-right: 1px dashed #E2E1DC; }
+  .col-cards { padding: 0 6px; border-right: 1px dashed #E2E1DC; padding-bottom: 12px; min-height: 60px; }
+  .col-cards:last-child, .col-header:last-child { border-right: none; }
+  .col-cards.drag-hover { background: #F8F7FF; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1A1918; color: white; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 999; }
+  .toast.show { opacity: 1; }
+  .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+  .modal { background: white; border-radius: 14px; width: 500px; max-width: 90vw; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+  .modal-header { padding: 16px 20px; border-bottom: 1px solid #EEEDE9; display: flex; justify-content: space-between; align-items: center; }
+  .modal-header h3 { font-size: 16px; font-weight: 700; }
+  .modal-header .close-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: #7C7B77; padding: 4px 8px; border-radius: 6px; }
+  .modal-header .close-btn:hover { background: #EEEDE9; }
+  .modal-body { padding: 20px; }
+  .field-row { margin-bottom: 14px; }
+  .field-label { font-size: 11px; color: #7C7B77; margin-bottom: 4px; display: block; }
+  .form-input, .form-select, .form-textarea { width: 100%; border: 1.5px solid #E8E7E3; border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: inherit; color: #1A1918; background: #FAFAF8; transition: border-color 0.15s; outline: none; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #5B4EE8; }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .save-btn { background: #5B4EE8; color: white; border: none; border-radius: 8px; padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.15s; margin-top: 8px; }
+  .save-btn:hover { background: #4A3DD0; }
+  .progress-control { display: flex; align-items: center; gap: 10px; }
+  .progress-control input[type=range] { flex: 1; accent-color: #5B4EE8; }
+  .progress-control span { font-size: 13px; font-weight: 600; color: #5B4EE8; min-width: 32px; }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .checkbox-row input[type=checkbox] { width: 16px; height: 16px; accent-color: #F04A30; }
+  .checkbox-row label { font-size: 13px; color: #1A1918; cursor: pointer; }
+  .month-range { font-size: 11px; color: #A0A09A; }
+  @media (max-width: 640px) { .grid-wrap { grid-template-columns: repeat(2, 1fr) !important; } }
+  .exporting .header-right, .exporting .timeline-controls, .exporting .card-actions,
+  .exporting .modal-overlay, .exporting .toast, .exporting .sync-bar, .exporting .token-setup { display: none !important; }
+  .exporting .header-left h1 { background: none !important; border-bottom: none !important; cursor: default; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-left">
+      <h1 id="projectTitle" contenteditable="true" spellcheck="false"
+          onblur="onTitleBlur()"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">MRO 产品路线图</h1>
+    </div>
+    <div class="header-right">
+      <div class="summary-chips" id="summaryChips"></div>
+      <button class="btn-outline" onclick="exportPNG()">📷 PNG</button>
+      <button class="btn-outline" onclick="exportPDF()">📄 PDF</button>
+      <button class="btn-icon" onclick="toggleTokenSetup()" title="GitHub 同步设置">⚙️</button>
+      <button class="btn" onclick="openAddModal()">+ 新增产品模块</button>
+    </div>
+  </div>
+
+  <div class="sync-bar" id="syncBar">
+    <div class="sync-status">
+      <div class="sync-dot warn" id="syncDot"></div>
+      <span id="syncText">未配置 GitHub Token，数据仅存本地</span>
+    </div>
+    <span class="sync-time" id="syncTime"></span>
+    <button class="btn-outline btn-sm" onclick="toggleTokenSetup()" id="setupBtn">配置云同步</button>
+  </div>
+
+  <div class="token-setup" id="tokenSetup" style="display:none">
+    <h3>🔗 GitHub 云同步设置</h3>
+    <p>修改数据后将自动保存到仓库 <b>Jasonlee911/lee-s-warehouse</b> 的 <code>data.json</code>。<br>Token 只存在你的浏览器本地，不会上传任何地方。</p>
+    <div class="token-input-row">
+      <input class="token-input" id="tokenInput" type="password" placeholder="粘贴 GitHub Personal Access Token (ghp_...)" autocomplete="off">
+      <button class="btn" onclick="saveToken()">保存并连接</button>
+      <button class="btn-outline" onclick="clearToken()">清除 Token</button>
+    </div>
+    <p style="margin-top:10px;font-size:11px;color:#9B8BF5;">
+      获取方式：GitHub 头像 → Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token → 勾选 <b>repo</b> → Generate
+    </p>
+  </div>
+
+  <div class="timeline-controls">
+    <label>年份</label>
+    <input type="number" id="yearInput" min="2020" max="2099" value="2025" onchange="updateTimeline()">
+    <label>起始月</label>
+    <input type="number" id="startMonthInput" min="1" max="12" value="6" onchange="updateTimeline()">
+    <label>结束月</label>
+    <input type="number" id="endMonthInput" min="1" max="12" value="11" onchange="updateTimeline()">
+    <span class="month-range" id="monthRangeHint">(最大跨度12个月)</span>
+    <button class="btn-outline" onclick="updateTimeline()">应用</button>
+  </div>
+
+  <div class="timeline-wrap">
+    <div class="timeline-axis" id="axisBar"></div>
+  </div>
+  <div class="grid-wrap" id="cardsGrid"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3 id="modalTitle">新增产品模块</h3>
+      <button class="close-btn" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-row">
+        <label class="field-label">产品模块名称 *</label>
+        <input class="form-input" id="modalTitleInput" placeholder="输入产品模块名称">
+      </div>
+      <div class="field-row">
+        <label class="field-label">模块说明</label>
+        <input class="form-input" id="modalSubInput" placeholder="输入模块说明">
+      </div>
+      <div class="field-row">
+        <label class="field-label">完成进度</label>
+        <div class="progress-control">
+          <input type="range" min="0" max="100" value="0" id="modalProgress" oninput="onModalProgressChange()">
+          <span id="modalProgressVal">0%</span>
+        </div>
+      </div>
+      <div class="field-row">
+        <label class="field-label">当前状态</label>
+        <select class="form-select" id="modalStatus" onchange="onModalStatusChange()">
+          <option value="todo">待开始</option>
+          <option value="wip">进行中</option>
+          <option value="done">已完成</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <label class="field-label">备注</label>
+        <textarea class="form-textarea" id="modalNotes" placeholder="记录备注信息..."></textarea>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="modalRisk">
+        <label for="modalRisk">标记为有风险</label>
+      </div>
+      <div class="field-row">
+        <label class="field-label">归属月份</label>
+        <select class="form-select" id="modalMonth"></select>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="save-btn" id="modalSaveBtn" onclick="saveModal()" style="flex:1;">保存</button>
+        <button class="btn btn-danger btn-sm" id="modalDeleteBtn" style="display:none;" onclick="deleteFromModal()">删除</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const GITHUB_OWNER = 'Jasonlee911';
+const GITHUB_REPO  = 'lee-s-warehouse';
+const DATA_FILE    = 'data.json';
+const API_URL      = 'https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/' + DATA_FILE;
+
+const MONTH_NAMES  = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+const STATUS_LABEL = { done:'已完成', wip:'进行中', todo:'待开始', risk:'有风险' };
+const STATUS_CLASS = { done:'s-done',  wip:'s-wip',  todo:'s-todo',  risk:'s-risk' };
+
+let year = 2025, startMonth = 6, endMonth = 11, months = [];
+let tasks = [], activeId = null, editId = null;
+let draggedTaskId = null;
+let fileSha = null;
+let saveTimer = null;
+
+/* ---- Token ---- */
+function getToken() { return localStorage.getItem('gh_token') || ''; }
+
+function toggleTokenSetup() {
+  var box = document.getElementById('tokenSetup');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  if (getToken()) document.getElementById('tokenInput').value = getToken();
+}
+
+function saveToken() {
+  var t = document.getElementById('tokenInput').value.trim();
+  if (!t) { showToast('请输入 Token'); return; }
+  localStorage.setItem('gh_token', t);
+  document.getElementById('tokenSetup').style.display = 'none';
+  showToast('Token 已保存，正在连接...');
+  initCloud();
+}
+
+function clearToken() {
+  localStorage.removeItem('gh_token');
+  fileSha = null;
+  document.getElementById('tokenInput').value = '';
+  document.getElementById('tokenSetup').style.display = 'none';
+  updateSyncUI('warn', '未配置 GitHub Token，数据仅存本地', '');
+}
+
+/* ---- Sync UI ---- */
+function updateSyncUI(state, text, time) {
+  document.getElementById('syncDot').className = 'sync-dot ' + state;
+  document.getElementById('syncText').textContent = text;
+  document.getElementById('syncTime').textContent = time || '';
+  var connected = (state === 'ok' || state === 'saving');
+  document.getElementById('setupBtn').style.display = connected ? 'none' : 'inline-block';
+}
+
+function fmtTime(d) {
+  return d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+}
+
+/* ---- Cloud init ---- */
+async function initCloud() {
+  var token = getToken();
+  if (!token) {
+    loadLocal();
+    updateSyncUI('warn', '未配置 GitHub Token，数据仅存本地', '');
+    return;
+  }
+  updateSyncUI('saving', '正在从 GitHub 加载数据...', '');
+  try {
+    var res = await fetch(API_URL, {
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (res.status === 404) {
+      loadLocal();
+      updateSyncUI('ok', '已连接 GitHub（首次使用，正在初始化）', '');
+      await pushToGitHub('初始化数据文件');
+      return;
+    }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var json = await res.json();
+    fileSha = json.sha;
+    var content = JSON.parse(atob(json.content.replace(/\n/g, '')));
+    applyData(content);
+    updateSyncUI('ok', '已连接 GitHub，数据已同步 ✓', '上次同步 ' + fmtTime(new Date()));
+  } catch(e) {
+    loadLocal();
+    updateSyncUI('error', '连接失败：' + (e.message || '网络错误') + '，使用本地数据', '');
+  }
+}
+
+/* ---- Push ---- */
+async function pushToGitHub(msg) {
+  var token = getToken();
+  if (!token) return;
+  var data    = buildData();
+  var content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+  var body    = { message: msg || ('更新路线图 ' + fmtTime(new Date())), content: content };
+  if (fileSha) body.sha = fileSha;
+  try {
+    var res = await fetch(API_URL, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'token ' + token,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) { var e = await res.json(); throw new Error(e.message || 'HTTP ' + res.status); }
+    var json = await res.json();
+    fileSha = json.content.sha;
+    updateSyncUI('ok', '已同步到 GitHub ✓', '上次同步 ' + fmtTime(new Date()));
+  } catch(e) {
+    updateSyncUI('error', '云端保存失败：' + (e.message || '网络错误'), '');
+    showToast('云端保存失败，数据已备份本地');
+  }
+}
+
+/* ---- save() ---- */
+function save() {
+  try { localStorage.setItem('mro_tasks_v2', JSON.stringify(buildData())); } catch(_) {}
+  if (!getToken()) return;
+  updateSyncUI('saving', '保存中...', '');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function() { pushToGitHub(); }, 1500);
+}
+
+/* ---- Data ---- */
+function buildData() {
+  return {
+    title: document.getElementById('projectTitle').textContent.trim() || 'MRO 产品路线图',
+    year: year, startMonth: startMonth, endMonth: endMonth,
+    tasks: JSON.parse(JSON.stringify(tasks))
+  };
+}
+
+function applyData(d) {
+  if (d.tasks && Array.isArray(d.tasks)) tasks = d.tasks;
+  if (d.title) { document.getElementById('projectTitle').textContent = d.title; document.title = d.title; }
+  if (d.year)       { year = d.year;             document.getElementById('yearInput').value = year; }
+  if (d.startMonth) { startMonth = d.startMonth; document.getElementById('startMonthInput').value = startMonth; }
+  if (d.endMonth)   { endMonth = d.endMonth;     document.getElementById('endMonthInput').value = endMonth; }
+  months = computeMonths();
+  renderAll();
+}
+
+function loadLocal() {
+  var raw = localStorage.getItem('mro_tasks_v2');
+  if (raw) { try { applyData(JSON.parse(raw)); return; } catch(_) {} }
+  applyDefaultData();
+}
+
+function applyDefaultData() {
+  tasks = [
+    { id:'t1',  month:0, title:'打通工单补货流程',    sub:'补货能力',                       status:'done', progress:100, notes:'', risk:false, order:0 },
+    { id:'t2',  month:1, title:'接入暂存柜暂存能力',   sub:'前置仓暂存能力',                 status:'done', progress:100, notes:'', risk:false, order:1 },
+    { id:'t3',  month:1, title:'MRO管理系统标准化',   sub:'平云小匠、阿玛塔、东风汽车对接',  status:'wip',  progress:60,  notes:'', risk:false, order:2 },
+    { id:'t4',  month:1, title:'接入顺丰寄件能力',    sub:'',                               status:'wip',  progress:40,  notes:'', risk:false, order:3 },
+    { id:'t5',  month:2, title:'MRO柜接入资产管理',   sub:'资产选址、资产激活等',            status:'todo', progress:15,  notes:'', risk:false, order:0 },
+    { id:'t6',  month:2, title:'外部迪卡依对接',       sub:'',                              status:'risk', progress:10,  notes:'', risk:true,  order:1 },
+    { id:'t7',  month:2, title:'MRO中台能力模块化',   sub:'存取能力',                       status:'todo', progress:20,  notes:'', risk:false, order:2 },
+    { id:'t8',  month:3, title:'暂存柜柜机交互重构',   sub:'',                              status:'todo', progress:0,   notes:'', risk:false, order:0 },
+    { id:'t9',  month:3, title:'客户关系管理',         sub:'',                              status:'todo', progress:0,   notes:'', risk:false, order:1 },
+    { id:'t10', month:4, title:'丰巢管家App优化',      sub:'',                              status:'todo', progress:0,   notes:'', risk:false, order:0 },
+    { id:'t11', month:4, title:'资金流水管理',         sub:'',                              status:'todo', progress:0,   notes:'', risk:false, order:1 },
+    { id:'t12', month:5, title:'CRM商机管理',          sub:'',                              status:'todo', progress:0,   notes:'', risk:false, order:0 },
+    { id:'t13', month:5, title:'丰蜜App优化',          sub:'',                              status:'todo', progress:0,   notes:'', risk:false, order:1 }
+  ];
+  months = computeMonths();
+  renderAll();
+}
+
+/* ---- Title ---- */
+function onTitleBlur() {
+  var el = document.getElementById('projectTitle');
+  var name = el.textContent.trim() || 'MRO 产品路线图';
+  el.textContent = name;
+  document.title = name;
+  save();
+}
+
+/* ---- Toast ---- */
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2200);
+}
+
+/* ---- Timeline ---- */
+function computeMonths() {
+  var m = [];
+  for (var i = startMonth; i <= endMonth; i++) m.push(MONTH_NAMES[i - 1]);
+  return m;
+}
+
+function updateTimeline() {
+  var y = parseInt(document.getElementById('yearInput').value);
+  var s = parseInt(document.getElementById('startMonthInput').value);
+  var e = parseInt(document.getElementById('endMonthInput').value);
+  if (isNaN(y)||isNaN(s)||isNaN(e)||s<1||s>12||e<1||e>12||s>e) { showToast('请输入有效的月份范围'); return; }
+  if (e - s > 11) { showToast('月份范围不能超过12个月'); return; }
+  year = y; startMonth = s; endMonth = e;
+  months = computeMonths();
+  tasks.forEach(function(t) { if (t.month >= months.length) t.month = months.length - 1; });
+  save(); renderAll();
+}
+
+/* ---- Render ---- */
+function renderSummary() {
+  var c = { done:0, wip:0, todo:0, risk:0 };
+  tasks.forEach(function(t) { c[t.status]++; });
+  document.getElementById('summaryChips').innerHTML =
+    '<span class="chip chip-done">&#x2713; 已完成 ' + c.done + '</span>' +
+    '<span class="chip chip-wip">&#x25D0; 进行中 ' + c.wip + '</span>' +
+    '<span class="chip chip-todo">&#x25CB; 待开始 ' + c.todo + '</span>' +
+    '<span class="chip chip-risk">! 有风险 ' + c.risk + '</span>';
+}
+
+function renderAxis() {
+  document.getElementById('axisBar').innerHTML = months.map(function(m) {
+    return '<div class="month-col"><div class="month-dot"></div><div class="month-label">' + m + '</div></div>';
+  }).join('');
+}
+
+function cardHTML(t) {
+  var pct = t.progress || 0;
+  var riskBadge = t.risk ? '<span class="risk-icon">&#x26A0;</span>' : '';
+  return '<div class="task-card ' + STATUS_CLASS[t.status] + ' ' + (activeId === t.id ? 'active' : '') + '" id="card_' + t.id + '" draggable="true"' +
+    ' ondragstart="onDragStart(event,\'' + t.id + '\')"' +
+    ' ondragend="onDragEnd(event,\'' + t.id + '\')"' +
+    ' ondragover="onDragOver(event,\'' + t.id + '\',' + t.month + ',' + (t.order||0) + ')"' +
+    ' ondragleave="onDragLeave(event,\'' + t.id + '\')"' +
+    ' ondrop="onDrop(event,\'' + t.id + '\',' + t.month + ',' + (t.order||0) + ')"' +
+    ' onclick="openEditModal(\'' + t.id + '\')">' +
+    '<div class="card-actions"><button onclick="event.stopPropagation();deleteTask(\'' + t.id + '\')" title="删除">&#x1F5D1;</button></div>' +
+    '<div class="card-tag">' + STATUS_LABEL[t.status] + riskBadge + '</div>' +
+    '<div class="card-title">' + t.title + '</div>' +
+    (t.sub ? '<div class="card-sub">| ' + t.sub + '</div>' : '') +
+    (t.notes ? '<div class="card-notes">' + t.notes + '</div>' : '') +
+    '<div class="progress-wrap">' +
+    '<div class="progress-label"><span>进度</span><span>' + pct + '%</span></div>' +
+    '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+    '</div></div>';
+}
+
+function renderCards() {
+  var numCols = months.length;
+  var cols = [];
+  for (var i = 0; i < numCols; i++) cols.push([]);
+  tasks.forEach(function(t) {
+    if (t.month >= numCols) t.month = numCols - 1;
+    cols[t.month].push(t);
+  });
+  cols.forEach(function(col) { col.sort(function(a,b) { return (a.order||0)-(b.order||0); }); });
+  document.getElementById('cardsGrid').style.gridTemplateColumns = 'repeat(' + numCols + ', 1fr)';
+  document.getElementById('cardsGrid').innerHTML = cols.map(function(col, mi) {
+    return '<div><div class="col-header">' + months[mi] + '</div>' +
+      '<div class="col-cards" id="col_' + mi + '"' +
+      ' ondragover="onColDragOver(event,' + mi + ')"' +
+      ' ondragleave="onColDragLeave(event,' + mi + ')"' +
+      ' ondrop="onColDrop(event,' + mi + ')">' +
+      col.map(cardHTML).join('') +
+      '</div></div>';
+  }).join('');
+}
+
+function renderAll() { renderAxis(); renderSummary(); renderCards(); }
+
+/* ---- Drag ---- */
+function onDragStart(e, id) {
+  draggedTaskId = id;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', id);
+  var c = document.getElementById('card_' + id);
+  if (c) c.classList.add('dragging');
+}
+function onDragEnd(e, id) {
+  draggedTaskId = null;
+  var c = document.getElementById('card_' + id);
+  if (c) c.classList.remove('dragging');
+  document.querySelectorAll('.drag-over').forEach(function(el) { el.classList.remove('drag-over'); });
+  document.querySelectorAll('.drag-hover').forEach(function(el) { el.classList.remove('drag-hover'); });
+}
+function onDragOver(e, id, monthIdx, orderIdx) {
+  e.preventDefault();
+  if (!draggedTaskId || draggedTaskId === id) return;
+  e.dataTransfer.dropEffect = 'move';
+  var c = document.getElementById('card_' + id);
+  if (c) c.classList.add('drag-over');
+}
+function onDragLeave(e, id) {
+  var c = document.getElementById('card_' + id);
+  if (c) c.classList.remove('drag-over');
+}
+function onDrop(e, targetId, targetMonth, targetOrder) {
+  e.preventDefault();
+  if (!draggedTaskId || draggedTaskId === targetId) return;
+  moveTask(draggedTaskId, targetMonth, targetOrder);
+}
+function onColDragOver(e, monthIdx) {
+  e.preventDefault();
+  if (!draggedTaskId) return;
+  e.dataTransfer.dropEffect = 'move';
+  var col = document.getElementById('col_' + monthIdx);
+  if (col) col.classList.add('drag-hover');
+}
+function onColDragLeave(e, monthIdx) {
+  var col = document.getElementById('col_' + monthIdx);
+  if (col) col.classList.remove('drag-hover');
+}
+function onColDrop(e, monthIdx) {
+  e.preventDefault();
+  if (!draggedTaskId) return;
+  var colTasks = tasks.filter(function(t) { return t.month === monthIdx; });
+  var maxOrder = colTasks.length > 0 ? Math.max.apply(null, colTasks.map(function(t) { return t.order||0; })) : -1;
+  moveTaskToMonth(draggedTaskId, monthIdx, maxOrder + 1);
+}
+function moveTask(taskId, targetMonth, targetOrder) {
+  var dragged = tasks.find(function(t) { return t.id === taskId; });
+  if (!dragged) return;
+  var oldMonth = dragged.month;
+  if (oldMonth === targetMonth) {
+    var others = tasks.filter(function(t) { return t.month === oldMonth && t.id !== taskId; }).sort(function(a,b) { return (a.order||0)-(b.order||0); });
+    var insertIdx = 0;
+    for (var i = 0; i < others.length; i++) { if ((others[i].order||0) < targetOrder) insertIdx = i + 1; }
+    others.splice(insertIdx, 0, dragged);
+    others.forEach(function(t, i) { t.order = i; });
+  } else {
+    dragged.month = targetMonth;
+    tasks.filter(function(t) { return t.month === targetMonth; }).sort(function(a,b){return (a.order||0)-(b.order||0);}).forEach(function(t,i){t.order=i;});
+    tasks.filter(function(t) { return t.month === oldMonth && t.id !== taskId; }).sort(function(a,b){return (a.order||0)-(b.order||0);}).forEach(function(t,i){t.order=i;});
+  }
+  save(); renderAll();
+}
+function moveTaskToMonth(taskId, newMonth, newOrder) {
+  var dragged = tasks.find(function(t) { return t.id === taskId; });
+  if (!dragged) return;
+  var oldMonth = dragged.month;
+  dragged.month = newMonth; dragged.order = newOrder;
+  tasks.filter(function(t){return t.month===newMonth;}).sort(function(a,b){return (a.order||0)-(b.order||0);}).forEach(function(t,i){t.order=i;});
+  if (oldMonth !== newMonth) tasks.filter(function(t){return t.month===oldMonth;}).sort(function(a,b){return (a.order||0)-(b.order||0);}).forEach(function(t,i){t.order=i;});
+  save(); renderAll();
+}
+
+/* ---- Modal ---- */
+function generateId() { return 't' + Date.now() + '_' + Math.random().toString(36).substr(2,6); }
+function getProgressFromStatus(s) { return s==='done'?100:s==='wip'?50:0; }
+
+function populateMonthSelect(sel) {
+  document.getElementById('modalMonth').innerHTML = months.map(function(m,i) {
+    return '<option value="' + i + '"' + (i===sel?' selected':'') + '>' + m + '</option>';
+  }).join('');
+}
+function openAddModal() {
+  editId = null;
+  document.getElementById('modalTitle').textContent = '新增产品模块';
+  document.getElementById('modalTitleInput').value = '';
+  document.getElementById('modalSubInput').value = '';
+  document.getElementById('modalProgress').value = 0;
+  document.getElementById('modalProgressVal').textContent = '0%';
+  document.getElementById('modalStatus').value = 'todo';
+  document.getElementById('modalNotes').value = '';
+  document.getElementById('modalRisk').checked = false;
+  document.getElementById('modalDeleteBtn').style.display = 'none';
+  document.getElementById('modalSaveBtn').textContent = '保存';
+  populateMonthSelect(0);
+  document.getElementById('modalOverlay').style.display = 'flex';
+}
+function openEditModal(id) {
+  var t = tasks.find(function(x) { return x.id === id; });
+  if (!t) return;
+  editId = id; activeId = id;
+  document.getElementById('modalTitle').textContent = '编辑产品模块';
+  document.getElementById('modalTitleInput').value = t.title;
+  document.getElementById('modalSubInput').value = t.sub || '';
+  document.getElementById('modalProgress').value = t.progress;
+  document.getElementById('modalProgressVal').textContent = t.progress + '%';
+  document.getElementById('modalStatus').value = (t.status === 'risk') ? 'wip' : t.status;
+  document.getElementById('modalNotes').value = t.notes || '';
+  document.getElementById('modalRisk').checked = t.risk;
+  document.getElementById('modalDeleteBtn').style.display = 'inline-block';
+  document.getElementById('modalSaveBtn').textContent = '保存修改';
+  populateMonthSelect(t.month);
+  document.getElementById('modalOverlay').style.display = 'flex';
+  renderCards();
+}
+function closeModal() {
+  document.getElementById('modalOverlay').style.display = 'none';
+  editId = null; activeId = null;
+  renderCards();
+}
+function onModalProgressChange() {
+  var val = parseInt(document.getElementById('modalProgress').value);
+  document.getElementById('modalProgressVal').textContent = val + '%';
+  document.getElementById('modalStatus').value = val >= 100 ? 'done' : val > 0 ? 'wip' : 'todo';
+}
+function onModalStatusChange() {
+  var p = getProgressFromStatus(document.getElementById('modalStatus').value);
+  document.getElementById('modalProgress').value = p;
+  document.getElementById('modalProgressVal').textContent = p + '%';
+}
+function saveModal() {
+  var title = document.getElementById('modalTitleInput').value.trim();
+  if (!title) { showToast('请输入产品模块名称'); return; }
+  var sub      = document.getElementById('modalSubInput').value.trim();
+  var progress = parseInt(document.getElementById('modalProgress').value);
+  var status   = document.getElementById('modalStatus').value;
+  var notes    = document.getElementById('modalNotes').value.trim();
+  var risk     = document.getElementById('modalRisk').checked;
+  var month    = parseInt(document.getElementById('modalMonth').value);
+  if (risk) status = 'risk';
+  if (status === 'done') progress = 100;
+  else if (status === 'todo' && progress > 0) progress = 0;
+
+  if (editId) {
+    var t = tasks.find(function(x) { return x.id === editId; });
+    if (t) { t.title=title; t.sub=sub; t.progress=progress; t.status=status; t.notes=notes; t.risk=risk; t.month=month; }
+  } else {
+    var safeMonth = Math.min(month, months.length - 1);
+    var colTasks  = tasks.filter(function(t) { return t.month === safeMonth; });
+    var maxOrder  = colTasks.length > 0 ? Math.max.apply(null, colTasks.map(function(t){return t.order||0;})) : -1;
+    tasks.push({ id:generateId(), month:safeMonth, title:title, sub:sub, status:status, progress:progress, notes:notes, risk:risk, order:maxOrder+1 });
+  }
+  save();
+  showToast(editId ? '✓ 已保存，同步中...' : '✓ 已新增，同步中...');
+  editId = null; activeId = null;
+  closeModal(); renderAll();
+}
+function deleteFromModal() {
+  if (!editId) return;
+  if (!confirm('确定要删除此产品模块吗？')) return;
+  tasks = tasks.filter(function(t) { return t.id !== editId; });
+  save(); showToast('✓ 已删除');
+  editId = null; activeId = null;
+  closeModal(); renderAll();
+}
+function deleteTask(id) {
+  if (!confirm('确定要删除此产品模块吗？')) return;
+  tasks = tasks.filter(function(t) { return t.id !== id; });
+  if (activeId === id) activeId = null;
+  save(); showToast('✓ 已删除'); renderAll();
+}
+
+/* ---- Export ---- */
+async function exportPNG() {
+  showToast('正在生成 PNG...');
+  var app = document.querySelector('.app');
+  app.classList.add('exporting');
+  try {
+    var canvas = await html2canvas(app, { backgroundColor: '#F7F6F3', scale: 2, useCORS: true, logging: false });
+    var a = document.createElement('a');
+    a.download = 'MRO路线图_' + year + '.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+    showToast('✓ PNG 已导出');
+  } catch(e) { showToast('导出失败，请重试'); }
+  app.classList.remove('exporting');
+}
+async function exportPDF() {
+  showToast('正在生成 PDF...');
+  var app = document.querySelector('.app');
+  app.classList.add('exporting');
+  try {
+    var canvas = await html2canvas(app, { backgroundColor: '#F7F6F3', scale: 2, useCORS: true, logging: false });
+    var imgData = canvas.toDataURL('image/png');
+    var jsPDF = window.jspdf.jsPDF;
+    var pdfW = 297, pdfH = 210;
+    var ratio = canvas.height / canvas.width;
+    var iW = pdfW - 20, iH = iW * ratio;
+    if (iH > pdfH - 30) { iH = pdfH - 30; iW = iH / ratio; }
+    var pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    pdf.setFillColor(91, 78, 232); pdf.rect(0, 0, pdfW, 6, 'F');
+    pdf.setFillColor(91, 78, 232); pdf.rect(0, pdfH - 6, pdfW, 6, 'F');
+    pdf.addImage(imgData, 'PNG', (pdfW - iW) / 2, 15, iW, iH);
+    pdf.setFontSize(7); pdf.setTextColor(150, 150, 150);
+    pdf.text('Generated: ' + new Date().toLocaleDateString('zh-CN'), 10, pdfH - 10);
+    pdf.save('MRO路线图_' + year + '.pdf');
+    showToast('✓ PDF 已导出');
+  } catch(e) { showToast('导出失败，请重试'); }
+  app.classList.remove('exporting');
+}
+
+/* ---- Init ---- */
+document.getElementById('yearInput').value = year;
+document.getElementById('startMonthInput').value = startMonth;
+document.getElementById('endMonthInput').value = endMonth;
+initCloud();
+</script>
+</body>
+</html>
