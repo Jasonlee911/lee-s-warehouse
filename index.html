@@ -296,7 +296,7 @@ async function initCloud() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     var json = await res.json();
     fileSha = json.sha;
-    var content = JSON.parse(atob(json.content.replace(/\n/g, '')));
+    var content = JSON.parse(decodeURIComponent(escape(atob(json.content.replace(/\n/g, '')))));
     applyData(content);
     updateSyncUI('ok', '已连接 GitHub，数据已同步 ✓', '上次同步 ' + fmtTime(new Date()));
   } catch(e) {
