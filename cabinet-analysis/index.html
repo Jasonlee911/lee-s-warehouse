@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>柜机补货 / 领用数据分析台</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F3F5F1;
+    --surface: #FFFFFF;
+    --surface-raised: #FBFCFA;
+    --ink: #182231;
+    --ink-muted: #6B7686;
+    --line: #E1E5DE;
+    --line-strong: #C9D0C3;
+    --navy: #16324F;
+    --navy-dark: #0E2238;
+    --navy-tint: #E9EEF3;
+    --amber: #D98B3F;
+    --amber-dark: #B36F2A;
+    --amber-tint: #FBF0E1;
+    --good: #2F7D5A;
+    --good-tint: #E4F2EA;
+    --bad: #C0432B;
+    --bad-tint: #FBEAE6;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 1px 2px rgba(20,30,20,0.06), 0 6px 20px -8px rgba(20,30,20,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      linear-gradient(180deg, rgba(22,50,79,0.03), transparent 220px),
+      var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans','PingFang SC','Microsoft YaHei',sans-serif;
+    font-size:14px;
+    line-height:1.5;
+  }
+  h1,h2,h3,.disp{ font-family:'Space Grotesk','IBM Plex Sans','PingFang SC',sans-serif; letter-spacing:.01em; }
+
+  /* ---------- shell layout ---------- */
+  .shell{ display:grid; grid-template-columns:240px 1fr; min-height:100vh; }
+  .sidebar{
+    background: linear-gradient(180deg, var(--navy), var(--navy-dark));
+    color:#EAF0F5;
+    padding:22px 16px 16px;
+    display:flex; flex-direction:column;
+    position:sticky; top:0; height:100vh;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; padding:0 6px 20px; }
+  .brand-mark{
+    width:34px;height:34px; border-radius:8px;
+    background:
+      repeating-linear-gradient(45deg, rgba(217,139,63,0.9) 0 3px, transparent 3px 6px),
+      var(--amber);
+    background-blend-mode: overlay;
+    flex:0 0 auto;
+    position:relative;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.25);
+  }
+  .brand-text .t1{ font-weight:700; font-size:15px; color:#fff; }
+  .brand-text .t2{ font-size:11px; color:#A9BCCB; letter-spacing:.06em; text-transform:uppercase; }
+
+  .locker-strip{
+    display:grid; grid-template-columns:repeat(8,1fr); gap:3px;
+    margin:4px 6px 22px; opacity:.55;
+  }
+  .locker-strip span{ height:5px; border-radius:1px; background:rgba(255,255,255,.18); }
+  .locker-strip span:nth-child(3n){ background:rgba(217,139,63,.55); }
+
+  nav.tabs{ display:flex; flex-direction:column; gap:3px; }
+  nav.tabs button{
+    all:unset; cursor:pointer;
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px; border-radius:8px;
+    color:#C7D3DD; font-size:13.5px; font-weight:500;
+    transition:background .15s, color .15s;
+  }
+  nav.tabs button .ic{ width:18px; text-align:center; opacity:.85; font-size:14px; }
+  nav.tabs button:hover{ background:rgba(255,255,255,.06); color:#fff; }
+  nav.tabs button.active{ background:var(--amber); color:#241305; font-weight:600; }
+  nav.tabs button.active .ic{ opacity:1; }
+
+  .sidebar-foot{ margin-top:auto; padding:12px 8px 4px; font-size:11px; color:#7E93A4; border-top:1px solid rgba(255,255,255,.08); padding-top:14px; }
+
+  main{ padding:26px 34px 60px; max-width:1240px; }
+  .page{ display:none; animation:fade .25s ease; }
+  .page.active{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+
+  .page-head{ margin-bottom:22px; }
+  .page-head h1{ font-size:21px; margin:0 0 4px; color:var(--navy-dark); }
+  .page-head p{ margin:0; color:var(--ink-muted); font-size:13px; }
+
+  /* ---------- cards / surfaces ---------- */
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); }
+  .card + .card{ margin-top:18px; }
+  .card-pad{ padding:20px 22px; }
+  .card-head{ display:flex; align-items:center; justify-content:space-between; padding:16px 22px; border-bottom:1px solid var(--line); }
+  .card-head h3{ margin:0; font-size:14.5px; color:var(--navy-dark); }
+  .card-head .sub{ font-size:12px; color:var(--ink-muted); margin-top:2px; }
+
+  .kpi-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
+  .kpi{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow); }
+  .kpi .label{ font-size:11.5px; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.06em; }
+  .kpi .value{ font-family:'Space Grotesk'; font-size:26px; font-weight:700; color:var(--navy-dark); margin-top:6px; }
+  .kpi .value .unit{ font-size:12px; font-weight:500; color:var(--ink-muted); margin-left:4px; }
+  .kpi .foot{ font-size:11.5px; color:var(--amber-dark); margin-top:6px; }
+
+  /* ---------- form controls ---------- */
+  label.field{ display:flex; flex-direction:column; gap:6px; font-size:12.5px; color:var(--ink-muted); }
+  label.field span.lbl{ font-weight:600; color:var(--ink); }
+  input[type=text], input[type=file], input[type=week], input[type=month], input[type=date], select, textarea{
+    font-family:inherit; font-size:13.5px; color:var(--ink);
+    background:var(--surface-raised); border:1px solid var(--line-strong); border-radius:var(--radius-sm);
+    padding:9px 10px; outline:none;
+  }
+  input:focus, select:focus, textarea:focus{ border-color:var(--navy); box-shadow:0 0 0 3px rgba(22,50,79,0.12); }
+  .radio-group{ display:flex; gap:10px; flex-wrap:wrap; }
+  .radio-pill{ position:relative; }
+  .radio-pill input{ position:absolute; opacity:0; }
+  .radio-pill label{
+    display:inline-flex; align-items:center; gap:7px; cursor:pointer;
+    padding:9px 14px; border:1px solid var(--line-strong); border-radius:999px;
+    font-size:13px; color:var(--ink-muted); background:var(--surface-raised);
+    transition:all .15s;
+  }
+  .radio-pill input:checked + label{ background:var(--navy); border-color:var(--navy); color:#fff; font-weight:600; }
+
+  .btn{
+    all:unset; cursor:pointer; display:inline-flex; align-items:center; gap:7px;
+    font-size:13px; font-weight:600; padding:9px 16px; border-radius:8px;
+    transition:filter .15s, transform .05s;
+  }
+  .btn:active{ transform:translateY(1px); }
+  .btn-primary{ background:var(--navy); color:#fff; }
+  .btn-primary:hover{ filter:brightness(1.12); }
+  .btn-accent{ background:var(--amber); color:#241305; }
+  .btn-accent:hover{ filter:brightness(1.06); }
+  .btn-ghost{ background:transparent; color:var(--navy); border:1px solid var(--line-strong); }
+  .btn-ghost:hover{ background:var(--navy-tint); }
+  .btn-danger{ background:var(--bad-tint); color:var(--bad); }
+  .btn-danger:hover{ filter:brightness(.97); }
+  .btn-sm{ padding:6px 11px; font-size:12px; border-radius:6px; }
+  .btn[disabled]{ opacity:.45; pointer-events:none; }
+
+  .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .flex-row{ display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap; }
+
+  /* ---------- tables ---------- */
+  table.data{ width:100%; border-collapse:collapse; font-size:13px; }
+  table.data thead th{
+    position:sticky; top:0; background:var(--navy-tint); color:var(--navy-dark);
+    text-align:left; padding:9px 12px; font-weight:600; font-size:12px;
+    border-bottom:1px solid var(--line-strong); white-space:nowrap;
+  }
+  table.data tbody td{ padding:8px 12px; border-bottom:1px solid var(--line); color:var(--ink); }
+  table.data tbody tr:hover{ background:#F7F9F5; }
+  table.data td.num, table.data th.num{ text-align:right; font-variant-numeric:tabular-nums; }
+  .table-wrap{ max-height:480px; overflow:auto; border-radius:var(--radius-sm); }
+  .table-wrap.short{ max-height:280px; }
+  .badge{ display:inline-block; padding:2px 9px; border-radius:999px; font-size:11px; font-weight:600; }
+  .badge.replenish{ background:var(--navy-tint); color:var(--navy); }
+  .badge.pickup{ background:var(--amber-tint); color:var(--amber-dark); }
+  .badge.week{ background:var(--good-tint); color:var(--good); }
+  .badge.month{ background:#EFEAF7; color:#5B3EA6; }
+  .badge.custom{ background:#F1F1F1; color:#555; }
+  .muted{ color:var(--ink-muted); }
+  .empty-state{ padding:40px 20px; text-align:center; color:var(--ink-muted); }
+  .empty-state .em-ic{ font-size:28px; margin-bottom:8px; }
+
+  .banner{ display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border-radius:var(--radius-sm); font-size:12.5px; margin-top:14px; }
+  .banner.ok{ background:var(--good-tint); color:var(--good); }
+  .banner.warn{ background:var(--amber-tint); color:var(--amber-dark); }
+  .banner.err{ background:var(--bad-tint); color:var(--bad); }
+
+  .toolbar{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+  .toolbar .spacer{ flex:1; }
+  .search-box{ position:relative; }
+  .search-box input{ padding-left:28px; width:220px; }
+  .search-box::before{ content:"⌕"; position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--ink-muted); font-size:14px; }
+
+  .segmented{ display:inline-flex; background:var(--surface-raised); border:1px solid var(--line-strong); border-radius:8px; padding:3px; }
+  .segmented button{ all:unset; cursor:pointer; padding:7px 14px; border-radius:6px; font-size:12.5px; font-weight:600; color:var(--ink-muted); }
+  .segmented button.active{ background:var(--navy); color:#fff; }
+
+  .chip-list{ display:flex; flex-wrap:wrap; gap:6px; }
+  .chip{ display:inline-flex; align-items:center; gap:6px; background:var(--navy-tint); color:var(--navy-dark); border-radius:999px; padding:5px 10px 5px 12px; font-size:12px; }
+  .chip button{ all:unset; cursor:pointer; color:var(--navy-dark); opacity:.6; font-size:13px; line-height:1; }
+  .chip button:hover{ opacity:1; }
+
+  .mini-note{ font-size:11.5px; color:var(--ink-muted); margin-top:6px; }
+  .divider{ height:1px; background:var(--line); margin:18px 0; }
+
+  a.linklike{ color:var(--navy); text-decoration:underline; cursor:pointer; font-weight:600; }
+
+  .checkbox-row{ display:flex; align-items:center; gap:8px; padding:7px 4px; border-bottom:1px solid var(--line); font-size:13px; }
+  .checkbox-row:last-child{ border-bottom:none; }
+  .checkbox-list{ max-height:220px; overflow:auto; border:1px solid var(--line); border-radius:var(--radius-sm); padding:4px 10px; background:var(--surface-raised); }
+
+  .editable-cell{ cursor:text; }
+  .editable-cell:hover{ background:#FFF7EC; }
+
+  .multi-select-dropdown .placeholder{ color:var(--ink-muted); }
+  .multi-select-dropdown .tag{
+    display:inline-flex;align-items:center;gap:4px;
+    background:var(--navy-tint);color:var(--navy-dark);
+    border-radius:4px;padding:2px 6px;font-size:11px;white-space:nowrap;
+  }
+  .multi-select-dropdown .tag .remove{ cursor:pointer; opacity:.5; font-weight:bold; }
+  .multi-select-dropdown .tag .remove:hover{ opacity:1; }
+  .multi-select-list label{
+    display:flex;align-items:center;gap:6px;padding:6px 10px;cursor:pointer;font-size:12.5px;
+    border-bottom:1px solid var(--line);
+  }
+  .multi-select-list label:hover{ background:var(--navy-tint); }
+  .multi-select-list label input{ margin:0; }
+
+  canvas{ max-width:100%; }
+
+  .pagination-bar{ border-top:1px solid var(--line); }
+  .pagination-btns button{
+    all:unset; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;
+    width:32px; height:32px; border-radius:6px; font-size:12.5px; font-weight:600;
+    color:var(--ink-muted); background:var(--surface-raised); border:1px solid var(--line);
+    transition:all .15s;
+  }
+  .pagination-btns button:hover{ background:var(--navy-tint); color:var(--navy-dark); border-color:var(--navy); }
+  .pagination-btns button.active{ background:var(--navy); color:#fff; border-color:var(--navy); }
+  .pagination-btns button[disabled]{ opacity:.35; pointer-events:none; }
+  .pagination-btns .page-gap{ display:inline-flex; align-items:center; padding:0 4px; color:var(--ink-muted); font-size:12px; }
+  .page-size-select{ font-size:12.5px; padding:6px 8px; border:1px solid var(--line-strong); border-radius:6px; background:var(--surface-raised); color:var(--ink); }
+
+  @media (max-width: 920px){
+    .shell{ grid-template-columns:1fr; }
+    .sidebar{ position:relative; height:auto; }
+    .kpi-row, .grid-2, .grid-3{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <div class="t1">柜机数据分析台</div>
+        <div class="t2">Replenish · Pickup</div>
+      </div>
+    </div>
+    <div class="locker-strip">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <nav class="tabs">
+      <button class="tab-btn" data-page="import"><span class="ic">⇪</span>数据导入</button>
+      <button class="tab-btn" data-page="stats"><span class="ic">▤</span>统计分析</button>
+      <button class="tab-btn" data-page="history"><span class="ic">◷</span>历史记录</button>
+      <button class="tab-btn" data-page="mapping"><span class="ic">⛁</span>柜机-大区映射</button>
+      <button class="tab-btn" data-page="sync"><span class="ic">↕</span>GitHub 同步</button>
+    </nav>
+    <div class="sidebar-foot">
+      数据保存在本机浏览器中<br/>建议定期用「历史记录」导出备份
+    </div>
+  </aside>
+
+  <main>
+    <!-- ============ IMPORT ============ -->
+    <section class="page" id="page-import">
+      <div class="page-head">
+        <h1>数据导入</h1>
+        <p>导入「工站-地区补货数据」或「工站-地区领用数据」透视模板（读取 Sheet1 汇总数据，解析「下单日期」作为日期）</p>
+      </div>
+
+      <div class="card">
+        <div class="card-pad">
+          <div class="grid-2">
+            <label class="field">
+              <span class="lbl">① 选择数据类型</span>
+              <span class="radio-group">
+                <span class="radio-pill">
+                  <input type="radio" name="importType" id="typeReplenish" value="replenish" checked>
+                  <label for="typeReplenish">补货数据</label>
+                </span>
+                <span class="radio-pill">
+                  <input type="radio" name="importType" id="typePickup" value="pickup">
+                  <label for="typePickup">领用数据</label>
+                </span>
+              </span>
+            </label>
+
+            <label class="field">
+              <span class="lbl">② 选择 Excel 模板文件（.xlsx）</span>
+              <input type="file" id="fileInput" accept=".xlsx,.xls">
+            </label>
+          </div>
+
+          <div style="margin-top:18px;">
+            <button class="btn btn-primary" id="parseBtn">解析并导入</button>
+          </div>
+
+          <div id="importBanner"></div>
+        </div>
+      </div>
+
+      <div class="card" id="previewCard" style="display:none;">
+        <div class="card-head">
+          <div>
+            <h3>预览：<span id="previewTitle"></span></h3>
+            <div class="sub" id="previewMeta"></div>
+          </div>
+          <div>
+            <button class="btn btn-ghost btn-sm" id="cancelImportBtn">取消</button>
+            <button class="btn btn-accent btn-sm" id="confirmImportBtn">确认保存本次导入</button>
+          </div>
+        </div>
+        <div class="card-pad">
+          <div class="table-wrap short">
+            <table class="data" id="previewTable">
+              <thead><tr><th>工站名称（柜机）</th><th>归属大区</th><th>下单日期</th><th class="num">数量</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ STATS ============ -->
+    <section class="page active" id="page-stats">
+      <div class="page-head">
+        <h1>统计分析</h1>
+        <p id="snapPageSubtitle">按柜机 / 大区维度统计补货与领用数量，支持日期范围筛选（最多半个月），10条一页分页浏览</p>
+      </div>
+
+      <div class="card">
+        <div class="card-pad">
+          <div class="toolbar">
+            <label class="field" style="min-width:140px;">
+              <span class="lbl">数据类型</span>
+              <select id="snapTypeFilter">
+                <option value="both" selected>补货+领用</option>
+                <option value="replenish">仅补货</option>
+                <option value="pickup">仅领用</option>
+              </select>
+            </label>
+            <label class="field" style="min-width:140px;">
+              <span class="lbl">统计维度</span>
+              <select id="snapDimFilter">
+                <option value="region">按大区</option>
+                <option value="station">按柜机</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="lbl">开始日期</span>
+              <input type="date" id="snapDateStart">
+            </label>
+            <label class="field">
+              <span class="lbl">结束日期</span>
+              <input type="date" id="snapDateEnd">
+            </label>
+          </div>
+          <div class="toolbar" style="margin-top:8px;">
+            <label class="field" style="min-width:180px;">
+              <span class="lbl">大区筛选（多选，留空=全部）</span>
+              <div style="position:relative;">
+                <div id="snapRegionDropdown" class="multi-select-dropdown" style="border:1px solid var(--line-strong);border-radius:var(--radius-sm);padding:8px 10px;background:var(--surface-raised);cursor:pointer;font-size:13px;min-width:180px;min-height:36px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;">
+                  <span class="placeholder" style="color:var(--ink-muted);">点击选择大区</span>
+                </div>
+                <div id="snapRegionList" class="multi-select-list" style="display:none;position:absolute;top:100%;left:0;z-index:100;background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--radius-sm);max-height:200px;overflow:auto;min-width:100%;box-shadow:var(--shadow);"></div>
+              </div>
+            </label>
+            <label class="field">
+              <span class="lbl">柜机搜索</span>
+              <div class="search-box"><input type="text" id="snapStationSearch" placeholder="模糊搜索柜机名称"></div>
+            </label>
+            <button class="btn btn-primary btn-sm" id="snapRefreshBtn" style="align-self:flex-end;">查询</button>
+          </div>
+          <div class="mini-note">日期范围最多选择半个月（15天），超范围将提示错误。进入页面默认展示最近有数据的半个月范围。</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3>统计结果</h3>
+            <div class="sub" id="snapResultMeta"></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div class="segmented" id="snapViewTabs">
+              <button class="active" data-view="aggregate">聚合统计</button>
+              <button data-view="detail">详情数据</button>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="exportSnapBtn">导出 Excel</button>
+          </div>
+        </div>
+        <div class="card-pad">
+          <div class="table-wrap" id="snapTableWrap"></div>
+          <div id="snapPagination" class="pagination-bar" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0 0;flex-wrap:wrap;gap:10px;">
+            <div class="pagination-info" id="snapPageInfo" style="font-size:12.5px;color:var(--ink-muted);"></div>
+            <div class="pagination-btns" id="snapPageBtns" style="display:flex;gap:6px;align-items:center;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HISTORY ============ -->
+    <section class="page" id="page-history">
+      <div class="page-head">
+        <h1>历史记录</h1>
+        <p>查看每一次导入的批次详情，可删除误导入的数据</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>全部导入批次</h3>
+          <div class="sub" id="historyCount"></div>
+        </div>
+        <div class="card-pad">
+          <div class="table-wrap" id="historyTableWrap"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MAPPING ============ -->
+    <section class="page" id="page-mapping">
+      <div class="page-head">
+        <h1>柜机-大区映射</h1>
+        <p>维护每台柜机（工站）所属大区。导入数据时会自动补充新柜机的映射关系；如归属大区发生变化可在此手动调整</p>
+      </div>
+
+      <div class="card">
+        <div class="card-pad">
+          <div class="toolbar">
+            <div class="search-box"><input type="text" id="mapSearch" placeholder="搜索柜机/大区"></div>
+            <div class="spacer"></div>
+            <button class="btn btn-ghost btn-sm" id="downloadTemplateBtn">下载映射模板</button>
+            <label class="btn btn-ghost btn-sm" style="cursor:pointer;">
+              导入映射文件
+              <input type="file" id="mapImportInput" accept=".xlsx,.xls,.csv" style="display:none;">
+            </label>
+            <button class="btn btn-accent btn-sm" id="addMappingRowBtn">+ 新增柜机</button>
+          </div>
+          <div id="mapBanner"></div>
+          <div class="table-wrap" id="mappingTableWrap"></div>
+        </div>
+      </div>
+    </section>
+    <!-- ============ GITHUB SYNC ============ -->
+    <section class="page" id="page-sync">
+      <div class="page-head">
+        <h1>GitHub 云同步</h1>
+        <p>通过 GitHub 仓库保存 mapping 和 snapshots，实现跨设备数据同步</p>
+      </div>
+      <div class="card">
+        <div class="card-pad">
+          <div class="grid-2">
+            <label class="field">
+              <span class="lbl">GitHub 仓库（格式：用户名/仓库名）</span>
+              <input type="text" id="ghRepo" placeholder="例如：Jasonlee911/cabinet-data">
+            </label>
+            <label class="field">
+              <span class="lbl">Personal Access Token</span>
+              <input type="password" id="ghToken" placeholder="ghp_...">
+            </label>
+            <label class="field">
+              <span class="lbl">数据文件路径</span>
+              <input type="text" id="ghPath" value="data.json">
+            </label>
+            <label class="field">
+              <span class="lbl">分支</span>
+              <input type="text" id="ghBranch" value="main">
+            </label>
+          </div>
+          <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-primary" id="testGitHub">测试 Token</button>
+            <button class="btn btn-accent" id="pullFromGitHub">从 GitHub 拉取</button>
+            <button class="btn btn-ghost" id="pushToGitHub">上传到 GitHub</button>
+          </div>
+          <div class="mini-note">Token 只保存在当前浏览器 localStorage 中，不会被上传到代码仓库。建议将 GitHub 仓库设为 Private，避免数据泄露。</div>
+          <div id="syncBanner"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ===================== storage ===================== */
+  const K_MAP = 'mro_mapping_v2';
+  const K_SNAP = 'mro_snapshots_v2';
+
+  function loadMapping(){ try{ return JSON.parse(localStorage.getItem(K_MAP)) || []; }catch(e){ return []; } }
+  function saveMapping(list){ localStorage.setItem(K_MAP, JSON.stringify(list)); }
+  function loadSnapshots(){ try{ return JSON.parse(localStorage.getItem(K_SNAP)) || []; }catch(e){ return []; } }
+  function saveSnapshots(list){ localStorage.setItem(K_SNAP, JSON.stringify(list)); }
+
+  let mapping = loadMapping();     // [{station, region}]
+  let snapshots = loadSnapshots(); // [{id,type,fileName,orderDate,importTime,records:[{station,region,qty,orderDate}],stationCount,totalQty}]
+
+  function mappingObj(){
+    const o = {};
+    mapping.forEach(m=> o[m.station]=m.region);
+    return o;
+  }
+
+  function uid(){ return 'id'+Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+
+  const TYPE_LABEL = { replenish:'补货', pickup:'领用' };
+
+  /* ===================== tab navigation ===================== */
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      document.getElementById('page-'+btn.dataset.page).classList.add('active');
+      if(btn.dataset.page==='stats') renderStatsTab();
+      if(btn.dataset.page==='history') renderHistory();
+      if(btn.dataset.page==='mapping') renderMapping();
+      if(btn.dataset.page==='sync') renderSyncPage();
+    });
+  });
+
+  /* ===================== period type inputs (removed) ===================== */
+
+  /* ===================== parsing xlsx ===================== */
+  function parseDate(val){
+    if(val==null) return '';
+    if(val instanceof Date) return val.toISOString().slice(0,10);
+    if(typeof val==='number'){
+      // Excel serial date
+      const d = new Date((val - 25569)*86400*1000);
+      return d.toISOString().slice(0,10);
+    }
+    let s = String(val).trim();
+    // Try common date formats
+    const m1 = s.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/);
+    if(m1) return `${m1[1]}-${String(m1[2]).padStart(2,'0')}-${String(m1[3]).padStart(2,'0')}`;
+    const m2 = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/);
+    if(m2) return `${m2[3]}-${String(m2[1]).padStart(2,'0')}-${String(m2[2]).padStart(2,'0')}`;
+    return s;
+  }
+
+  function parseSheet1(workbook, type){
+    const sheetName = workbook.SheetNames.find(n=>n==='Sheet1') || workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    if(!sheet) throw new Error('未在文件中找到 Sheet1（透视数据）工作表');
+    const rows = XLSX.utils.sheet_to_json(sheet, {header:1, defval:null, raw:true});
+
+    let headerRowIdx = -1;
+    for(let i=0;i<rows.length;i++){
+      const row = rows[i];
+      if(row && row.some(c=> typeof c==='string' && c.trim()==='工站名称')){
+        headerRowIdx = i; break;
+      }
+    }
+    if(headerRowIdx===-1) throw new Error('未识别到表头"工站名称"，请确认文件使用了正确的数据模板（Sheet1）');
+
+    const header = rows[headerRowIdx].map(c=> typeof c==='string' ? c.trim() : c);
+    const stationCol = header.findIndex(c=> c==='工站名称');
+    
+    // Smart column matching by type
+    let qtyCol = -1;
+    let dateCol = -1;
+    if(type==='replenish'){
+      // 补货：数量=「本次补货数量」, 日期=「补货时间」
+      qtyCol = header.findIndex(c=> typeof c==='string' && c==='本次补货数量');
+      if(qtyCol===-1) qtyCol = header.findIndex(c=> typeof c==='string' && c.indexOf('补货数量')>-1);
+      if(qtyCol===-1) qtyCol = header.findIndex(c=> typeof c==='string' && c.indexOf('数量')>-1 && c.indexOf('含税')===-1 && c.indexOf('总额')===-1);
+      dateCol = header.findIndex(c=> typeof c==='string' && c==='补货时间');
+      if(dateCol===-1) dateCol = header.findIndex(c=> typeof c==='string' && c.indexOf('下单日期')>-1);
+    } else {
+      // 领用：数量=「领用数量/数量/求和项」，日期=「领用日期/领用时间/下单日期」
+      qtyCol = header.findIndex(c=> typeof c==='string' && (c==='领用数量' || c==='本次领用数量' || c==='数量'));
+      if(qtyCol===-1) qtyCol = header.findIndex(c=> typeof c==='string' && c.indexOf('求和项')>-1);
+      dateCol = header.findIndex(c=> typeof c==='string' && (c==='领用日期' || c==='领用时间' || c==='下单日期'));
+      if(dateCol===-1) dateCol = header.findIndex(c=> typeof c==='string' && c.indexOf('补货时间')>-1);
+    }
+    if(qtyCol===-1) qtyCol = header.findIndex(c=> typeof c==='string' && c.indexOf('数量')>-1 && c.indexOf('含税')===-1 && c.indexOf('总额')===-1 && c.indexOf('单价')===-1);
+    if(dateCol===-1) dateCol = header.findIndex(c=> typeof c==='string' && (c.indexOf('日期')>-1 || c.indexOf('时间')>-1));
+    
+    if(stationCol===-1) throw new Error('未识别到"工站名称"列');
+    if(qtyCol===-1) throw new Error('未识别到数量列');
+
+    const raw = [];
+    for(let i=headerRowIdx+1;i<rows.length;i++){
+      const row = rows[i];
+      if(!row) continue;
+      const stationVal = row[stationCol];
+      if(typeof stationVal !== 'string') continue;
+      const station = stationVal.trim();
+      if(station==='' || station==='(空白)' || station==='总计') continue;
+      let qtyVal = row[qtyCol];
+      if(typeof qtyVal === 'string') qtyVal = qtyVal.replace(/,/g,'').trim();
+      const qty = parseFloat(qtyVal);
+      if(isNaN(qty)) continue;
+      const orderDate = dateCol>-1 ? parseDate(row[dateCol]) : '';
+      raw.push({station, qty, orderDate});
+    }
+    if(raw.length===0) throw new Error('未解析到任何有效数据行，请检查模板内容');
+
+    // merge duplicates within same file (by station + orderDate)
+    const map = new Map();
+    raw.forEach(r=>{
+      const key = r.station + '|' + r.orderDate;
+      if(!map.has(key)) map.set(key, {station:r.station, qty:0, orderDate:r.orderDate});
+      const item = map.get(key);
+      item.qty += r.qty;
+    });
+    return Array.from(map.values());
+  }
+
+  let pendingImport = null; // {type, fileName, records, orderDate}
+
+  document.getElementById('parseBtn').addEventListener('click', ()=>{
+    const bannerEl = document.getElementById('importBanner');
+    bannerEl.innerHTML = '';
+    const file = document.getElementById('fileInput').files[0];
+    const type = document.querySelector('input[name=importType]:checked').value;
+
+    if(!file){ bannerEl.innerHTML = banner('err','请先选择要导入的 Excel 文件'); return; }
+
+    const reader = new FileReader();
+    reader.onload = function(e){
+      try{
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, {type:'array'});
+        const records = parseSheet1(workbook, type);
+        // Determine the main order date from records
+        const dates = [...new Set(records.map(r=>r.orderDate).filter(Boolean))];
+        const orderDate = dates.length>0 ? dates.sort()[0] : todayStr();
+        pendingImport = {
+          type,
+          fileName: file.name,
+          orderDate,
+          records,
+          stationCount: records.length,
+          totalQty: records.reduce((s,r)=>s+r.qty,0)
+        };
+        showPreview(pendingImport);
+        bannerEl.innerHTML = banner('ok', `解析成功：识别到 ${records.length} 条记录，合计数量 ${fmt(pendingImport.totalQty)}。下单日期：${orderDate}。请核对预览后确认保存。`);
+      }catch(err){
+        bannerEl.innerHTML = banner('err', '解析失败：'+err.message);
+        document.getElementById('previewCard').style.display='none';
+      }
+    };
+    reader.onerror = function(){ bannerEl.innerHTML = banner('err','文件读取失败，请重试'); };
+    reader.readAsArrayBuffer(file);
+  });
+
+  function showPreview(imp){
+    document.getElementById('previewCard').style.display='';
+    document.getElementById('previewTitle').textContent = `${TYPE_LABEL[imp.type]}数据 · 下单日期：${imp.orderDate}`;
+    document.getElementById('previewMeta').textContent = `文件：${imp.fileName} ｜ 记录数：${imp.stationCount} ｜ 合计数量：${fmt(imp.totalQty)}`;
+    const tbody = document.querySelector('#previewTable tbody');
+    tbody.innerHTML = imp.records
+      .slice().sort((a,b)=>b.qty-a.qty)
+      .map(r=>`<tr><td>${esc(r.station)}</td><td>${esc(regionOf(r.station)||'—')}</td><td>${esc(r.orderDate||'—')}</td><td class="num">${fmt(r.qty)}</td></tr>`)
+      .join('');
+  }
+
+  document.getElementById('cancelImportBtn').addEventListener('click', ()=>{
+    pendingImport = null;
+    document.getElementById('previewCard').style.display='none';
+    document.getElementById('importBanner').innerHTML='';
+  });
+
+  document.getElementById('confirmImportBtn').addEventListener('click', ()=>{
+    if(!pendingImport) return;
+    const snap = {
+      id: uid(),
+      importTime: new Date().toISOString(),
+      type: pendingImport.type,
+      fileName: pendingImport.fileName,
+      orderDate: pendingImport.orderDate,
+      records: pendingImport.records,
+      stationCount: pendingImport.stationCount,
+      totalQty: pendingImport.totalQty
+    };
+    snapshots.push(snap);
+    saveSnapshots(snapshots);
+
+    // reconcile mapping: ensure all stations have a region in mapping
+    let added=0;
+    const mObj = mappingObj();
+    snap.records.forEach(r=>{
+      if(!(r.station in mObj)){
+        // New station: add to mapping with empty region, user can set it later
+        mObj[r.station] = '';
+        added++;
+      }
+    });
+    mapping = Object.entries(mObj).map(([station,region])=>({station,region}));
+    saveMapping(mapping);
+
+    let msg = `已保存本次导入（${TYPE_LABEL[snap.type]} · ${snap.orderDate}）。`;
+    if(added>0) msg += ` 新增 ${added} 个柜机到映射表，请在「柜机-大区映射」中完善归属大区信息。`;
+    document.getElementById('importBanner').innerHTML = banner('ok', msg);
+
+    pendingImport = null;
+    document.getElementById('previewCard').style.display='none';
+    document.getElementById('fileInput').value='';
+    renderHistory();
+  });
+
+  /* ===================== helpers ===================== */
+  function fmt(n){ return Number(n).toLocaleString('zh-CN', {maximumFractionDigits:1}); }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function banner(kind,msg){ return `<div class="banner ${kind}">${msg}</div>`; }
+  function regionOf(station){ const o=mappingObj(); return o[station] || '未分配'; }
+
+  /* ===================== history ===================== */
+  function renderHistory(){
+    const wrap = document.getElementById('historyTableWrap');
+    document.getElementById('historyCount').textContent = `共 ${snapshots.length} 条导入记录`;
+    if(snapshots.length===0){
+      wrap.innerHTML = `<div class="empty-state"><div class="em-ic">◷</div>暂无历史导入记录</div>`;
+      return;
+    }
+    const sorted = snapshots.slice().sort((a,b)=> new Date(b.importTime)-new Date(a.importTime));
+    wrap.innerHTML = `<table class="data"><thead><tr>
+        <th>导入时间</th><th>类型</th><th>下单日期</th><th>文件名</th><th class="num">记录数</th><th class="num">合计数量</th><th></th>
+      </tr></thead><tbody>` +
+      sorted.map(s=>`<tr>
+        <td>${new Date(s.importTime).toLocaleString('zh-CN')}</td>
+        <td><span class="badge ${s.type}">${TYPE_LABEL[s.type]}</span></td>
+        <td>${esc(s.orderDate||'—')}</td>
+        <td>${esc(s.fileName)}</td>
+        <td class="num">${s.stationCount}</td>
+        <td class="num">${fmt(s.totalQty)}</td>
+        <td><button class="btn btn-danger btn-sm" data-del="${s.id}">删除</button></td>
+      </tr>`).join('') + `</tbody></table>`;
+
+    wrap.querySelectorAll('[data-del]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(!confirm('确认删除该导入批次？删除后无法恢复。')) return;
+        snapshots = snapshots.filter(s=>s.id!==btn.dataset.del);
+        saveSnapshots(snapshots);
+        renderHistory();
+      });
+    });
+  }
+
+  /* ===================== mapping ===================== */
+  function renderMapping(){
+    const wrap = document.getElementById('mappingTableWrap');
+    const q = (document.getElementById('mapSearch').value||'').trim().toLowerCase();
+    const list = mapping.filter(m=> !q || m.station.toLowerCase().includes(q) || (m.region||'').toLowerCase().includes(q))
+      .sort((a,b)=> a.region.localeCompare(b.region) || a.station.localeCompare(b.station));
+
+    if(mapping.length===0){
+      wrap.innerHTML = `<div class="empty-state"><div class="em-ic">⛁</div>暂无映射数据，导入一次数据后将自动生成，或点击"新增柜机"手动添加</div>`;
+      return;
+    }
+
+    wrap.innerHTML = `<table class="data"><thead><tr><th>柜机（工站名称）</th><th>归属大区</th><th></th></tr></thead><tbody>` +
+      list.map((m,idx)=>`<tr data-station="${esc(m.station)}">
+        <td class="editable-cell" data-field="station">${esc(m.station)}</td>
+        <td class="editable-cell" data-field="region">${esc(m.region)}</td>
+        <td><button class="btn btn-danger btn-sm" data-delmap="${esc(m.station)}">删除</button></td>
+      </tr>`).join('') + `</tbody></table>`;
+
+    wrap.querySelectorAll('.editable-cell').forEach(td=>{
+      td.addEventListener('click', function handler(){
+        if(td.querySelector('input')) return;
+        const original = td.textContent;
+        td.innerHTML = `<input type="text" value="${esc(original)}" style="width:100%;">`;
+        const input = td.querySelector('input');
+        input.focus(); input.select();
+        function commit(){
+          const tr = td.closest('tr');
+          const oldStation = tr.dataset.station;
+          const field = td.dataset.field;
+          const newVal = input.value.trim();
+          const item = mapping.find(m=>m.station===oldStation);
+          if(item && newVal){
+            if(field==='station'){
+              if(mapping.some(m=>m.station===newVal && m!==item)){
+                alert('该柜机名称已存在，请使用唯一名称'); renderMapping(); return;
+              }
+              item.station = newVal;
+            } else { item.region = newVal; }
+            saveMapping(mapping);
+          }
+          renderMapping();
+        }
+        input.addEventListener('blur', commit);
+        input.addEventListener('keydown', e=>{ if(e.key==='Enter') input.blur(); if(e.key==='Escape'){ renderMapping(); } });
+      });
+    });
+    wrap.querySelectorAll('[data-delmap]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(!confirm('确认删除该柜机映射？')) return;
+        mapping = mapping.filter(m=>m.station!==btn.dataset.delmap);
+        saveMapping(mapping);
+        renderMapping();
+      });
+    });
+  }
+  document.getElementById('mapSearch').addEventListener('input', renderMapping);
+
+  document.getElementById('addMappingRowBtn').addEventListener('click', ()=>{
+    const station = prompt('请输入柜机（工站名称）：');
+    if(!station) return;
+    if(mapping.some(m=>m.station===station.trim())){ alert('该柜机已存在'); return; }
+    const region = prompt('请输入归属大区：') || '';
+    mapping.push({station: station.trim(), region: region.trim()});
+    saveMapping(mapping);
+    renderMapping();
+  });
+
+  document.getElementById('downloadTemplateBtn').addEventListener('click', ()=>{
+    const wsData = [['工站名称','归属大区']].concat(mapping.length ? mapping.map(m=>[m.station,m.region]) : [['示例：某某转运中心','示例：华东区']]);
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols'] = [{wch:30},{wch:14}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '柜机大区映射');
+    XLSX.writeFile(wb, `柜机大区映射模板_${todayStr()}.xlsx`);
+  });
+
+  document.getElementById('mapImportInput').addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    const banner_ = document.getElementById('mapBanner');
+    banner_.innerHTML='';
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      try{
+        const wb = XLSX.read(new Uint8Array(ev.target.result), {type:'array'});
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, {header:1, defval:null});
+        let headerIdx = rows.findIndex(r=> r && r.some(c=> typeof c==='string' && c.trim()==='工站名称'));
+        if(headerIdx===-1) throw new Error('未找到"工站名称"表头，请使用下载的模板格式');
+        const header = rows[headerIdx];
+        const sCol = header.findIndex(c=> c==='工站名称');
+        const rCol = header.findIndex(c=> c==='归属大区' || c==='归属地区');
+        if(sCol===-1||rCol===-1) throw new Error('模板需包含"工站名称"和"归属大区"两列');
+        let updated=0, addedN=0;
+        const mObj = mappingObj();
+        for(let i=headerIdx+1;i<rows.length;i++){
+          const row = rows[i]; if(!row) continue;
+          const st = row[sCol], rg = row[rCol];
+          if(typeof st!=='string' || !st.trim()) continue;
+          const key = st.trim();
+          const val = (rg==null?'':String(rg)).trim();
+          if(!val) continue;
+          if(key in mObj){ if(mObj[key]!==val) updated++; } else { addedN++; }
+          mObj[key]=val;
+        }
+        mapping = Object.entries(mObj).map(([station,region])=>({station,region}));
+        saveMapping(mapping);
+        banner_.innerHTML = banner('ok', `映射导入成功：新增 ${addedN} 条，更新 ${updated} 条。`);
+        renderMapping();
+      }catch(err){
+        banner_.innerHTML = banner('err','导入失败：'+err.message);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+    e.target.value='';
+  });
+
+  function todayStr(){ return new Date().toISOString().slice(0,10); }
+
+  /* ===================== stats tab ===================== */
+  let snapViewMode = 'aggregate'; // 'aggregate' or 'detail'
+  let selectedRegions = []; // selected region names for multi-select filter
+  let snapCurrentPage = 1;
+  const snapPageSize = 10;
+
+  function renderStatsTab(){
+    // Initialize region dropdown if not yet
+    initRegionDropdown();
+    // Set default date range on first visit
+    setDefaultDateRange();
+    renderSnapshotStats();
+  }
+
+  function setDefaultDateRange(){
+    const startEl = document.getElementById('snapDateStart');
+    const endEl = document.getElementById('snapDateEnd');
+    // Only set if both are empty (first visit)
+    if(startEl.value || endEl.value) return;
+
+    // Find all dates with data from snapshots
+    const allDates = new Set();
+    snapshots.forEach(s=>{
+      s.records.forEach(r=>{
+        const d = r.orderDate || s.orderDate || '';
+        if(d) allDates.add(d);
+      });
+    });
+    if(allDates.size===0) return;
+
+    const sortedDates = Array.from(allDates).sort();
+    const latestDate = sortedDates[sortedDates.length-1];
+
+    // Go back up to 15 days from the latest date
+    const endDate = new Date(latestDate + 'T00:00:00');
+    const startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - 14); // 15 days inclusive
+
+    const startStr = startDate.toISOString().slice(0,10);
+    const endStr = endDate.toISOString().slice(0,10);
+
+    // Find the actual start date that is >= startStr and exists in allDates
+    let actualStart = startStr;
+    const datesInRange = sortedDates.filter(d=> d>=startStr && d<=endStr);
+    if(datesInRange.length>0){
+      actualStart = datesInRange[0];
+    }
+
+    startEl.value = actualStart;
+    endEl.value = endStr;
+  }
+
+  function initRegionDropdown(){
+    const dropdown = document.getElementById('snapRegionDropdown');
+    const listEl = document.getElementById('snapRegionList');
+    if(listEl.dataset.inited) return;
+    listEl.dataset.inited = '1';
+
+    // Toggle dropdown
+    dropdown.addEventListener('click', (e)=>{
+      if(e.target.closest('.remove')) return;
+      listEl.style.display = listEl.style.display==='none' ? 'block' : 'none';
+    });
+    document.addEventListener('click', (e)=>{
+      if(!dropdown.contains(e.target) && !listEl.contains(e.target)){
+        listEl.style.display = 'none';
+      }
+    });
+    updateRegionDropdown();
+  }
+
+  function updateRegionDropdown(){
+    const dropdown = document.getElementById('snapRegionDropdown');
+    const listEl = document.getElementById('snapRegionList');
+
+    // Collect all distinct regions from mapping
+    const regions = [...new Set(mapping.map(m=>m.region).filter(Boolean))].sort();
+
+    // Render selected tags in dropdown
+    if(selectedRegions.length===0){
+      dropdown.innerHTML = '<span class="placeholder">点击选择大区（留空=全部）</span>';
+    } else {
+      dropdown.innerHTML = selectedRegions.map(r=>`<span class="tag">${esc(r)}<span class="remove" data-region="${esc(r)}">×</span></span>`).join('');
+    }
+
+    // Attach remove handlers
+    dropdown.querySelectorAll('.remove').forEach(el=>{
+      el.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        selectedRegions = selectedRegions.filter(r=>r!==el.dataset.region);
+        updateRegionDropdown();
+      });
+    });
+
+    // Render checkbox list
+    listEl.innerHTML = regions.map(r=>{
+      const checked = selectedRegions.includes(r) ? 'checked' : '';
+      return `<label><input type="checkbox" value="${esc(r)}" ${checked} onchange="window.__toggleRegion('${esc(r)}', this.checked)">${esc(r)}</label>`;
+    }).join('');
+
+    // Quick actions
+    if(regions.length>0){
+      listEl.innerHTML += `<div style="padding:4px 10px;border-top:1px solid var(--line);display:flex;gap:8px;">
+        <a class="linklike" onclick="window.__selectAllRegions(true)" style="font-size:11px;">全选</a>
+        <a class="linklike" onclick="window.__selectAllRegions(false)" style="font-size:11px;">清空</a>
+      </div>`;
+    }
+
+    window.__regionsList = regions;
+  }
+
+  window.__toggleRegion = function(region, checked){
+    if(checked) selectedRegions.push(region);
+    else selectedRegions = selectedRegions.filter(r=>r!==region);
+    updateRegionDropdown();
+  };
+  window.__selectAllRegions = function(select){
+    selectedRegions = select ? [...(window.__regionsList||[])] : [];
+    updateRegionDropdown();
+  };
+
+  function renderPagination(totalRows, renderFn){
+    const pageInfo = document.getElementById('snapPageInfo');
+    const pageBtns = document.getElementById('snapPageBtns');
+    const totalPages = Math.ceil(totalRows / snapPageSize);
+
+    if(snapCurrentPage > totalPages) snapCurrentPage = totalPages;
+    if(snapCurrentPage < 1) snapCurrentPage = 1;
+
+    const start = totalRows===0 ? 0 : (snapCurrentPage-1)*snapPageSize + 1;
+    const end = Math.min(snapCurrentPage*snapPageSize, totalRows);
+
+    pageInfo.textContent = totalRows===0 ? '暂无数据' : `共 ${totalRows} 条，显示第 ${start}-${end} 条`;
+
+    if(totalPages <= 1){
+      pageBtns.innerHTML = '';
+      return;
+    }
+
+    // Build page buttons
+    let btnHTML = '';
+    btnHTML += `<button ${snapCurrentPage===1?'disabled':''} data-page="prev">◀</button>`;
+
+    const maxShow = 5;
+    let pStart = Math.max(1, snapCurrentPage - Math.floor(maxShow/2));
+    let pEnd = Math.min(totalPages, pStart + maxShow - 1);
+    if(pEnd - pStart < maxShow - 1) pStart = Math.max(1, pEnd - maxShow + 1);
+
+    if(pStart > 1){
+      btnHTML += `<button data-page="1">1</button>`;
+      if(pStart > 2) btnHTML += `<span class="page-gap">…</span>`;
+    }
+
+    for(let i=pStart; i<=pEnd; i++){
+      btnHTML += `<button class="${i===snapCurrentPage?'active':''}" data-page="${i}">${i}</button>`;
+    }
+
+    if(pEnd < totalPages){
+      if(pEnd < totalPages-1) btnHTML += `<span class="page-gap">…</span>`;
+      btnHTML += `<button data-page="${totalPages}">${totalPages}</button>`;
+    }
+
+    btnHTML += `<button ${snapCurrentPage===totalPages?'disabled':''} data-page="next">▶</button>`;
+    pageBtns.innerHTML = btnHTML;
+
+    // Click handlers
+    pageBtns.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const p = btn.dataset.page;
+        if(p==='prev') snapCurrentPage = Math.max(1, snapCurrentPage-1);
+        else if(p==='next') snapCurrentPage = Math.min(totalPages, snapCurrentPage+1);
+        else snapCurrentPage = parseInt(p);
+        renderFn();
+      });
+    });
+  }
+
+  function renderSnapshotStats(resetPage){
+    if(resetPage) snapCurrentPage = 1;
+
+    const typeFilter = document.getElementById('snapTypeFilter').value;
+    const dim = document.getElementById('snapDimFilter').value;
+    const dateStart = document.getElementById('snapDateStart').value;
+    const dateEnd = document.getElementById('snapDateEnd').value;
+    const stationSearch = (document.getElementById('snapStationSearch').value||'').trim().toLowerCase();
+
+    const metaEl = document.getElementById('snapResultMeta');
+    const tableWrap = document.getElementById('snapTableWrap');
+
+    // Update page subtitle with date range
+    const subtitleEl = document.getElementById('snapPageSubtitle');
+    if(dateStart && dateEnd){
+      subtitleEl.innerHTML = `<strong style="color:var(--navy);font-size:14px;">📅 时间范围：${dateStart} ~ ${dateEnd}</strong> &nbsp;·&nbsp; 按${dim==='region'?'大区':'柜机'}维度统计补货与领用数量，10条一页分页浏览`;
+    } else {
+      subtitleEl.textContent = `按${dim==='region'?'大区':'柜机'}维度统计补货与领用数量，支持日期范围筛选（最多半个月），10条一页分页浏览`;
+    }
+
+    // Validate date range: max 15 days
+    if(dateStart && dateEnd){
+      const d1 = new Date(dateStart);
+      const d2 = new Date(dateEnd);
+      const diffDays = Math.round((d2 - d1) / (1000*60*60*24));
+      if(diffDays > 15){
+        metaEl.textContent = '日期范围最多只能选择半个月（15天）';
+        tableWrap.innerHTML = `<div class="empty-state"><div class="em-ic">⚠</div>日期范围最多只能选择半个月（15天），请重新选择</div>`;
+        document.getElementById('snapPageInfo').textContent = '';
+        document.getElementById('snapPageBtns').innerHTML = '';
+        return;
+      }
+      if(diffDays < 0){
+        metaEl.textContent = '开始日期不能晚于结束日期';
+        tableWrap.innerHTML = `<div class="empty-state"><div class="em-ic">⚠</div>开始日期不能晚于结束日期</div>`;
+        document.getElementById('snapPageInfo').textContent = '';
+        document.getElementById('snapPageBtns').innerHTML = '';
+        return;
+      }
+    }
+
+    if(snapshots.length===0){
+      metaEl.textContent = '暂无数据，请先导入数据';
+      tableWrap.innerHTML = `<div class="empty-state"><div class="em-ic">▤</div>暂无数据</div>`;
+      document.getElementById('snapPageInfo').textContent = '';
+      document.getElementById('snapPageBtns').innerHTML = '';
+      return;
+    }
+
+    function keyOf(r){ return dim==='region' ? (regionOf(r.station) || '未分配') : r.station; }
+
+    // Helper: filter records by date range and other criteria
+    function filterRecords(snapshotsToFilter, typeLabel){
+      let filtered = typeLabel==='both' ? snapshotsToFilter : snapshotsToFilter.filter(s=>s.type===typeLabel);
+
+      // Filter records by date range
+      if(dateStart || dateEnd){
+        filtered = filtered.map(s=>{
+          const filteredRecords = s.records.filter(r=>{
+            const d = r.orderDate || s.orderDate || '';
+            if(dateStart && d<dateStart) return false;
+            if(dateEnd && d>dateEnd) return false;
+            return true;
+          });
+          if(filteredRecords.length===0) return null;
+          return { ...s, records: filteredRecords };
+        }).filter(Boolean);
+      }
+
+      // Filter by selected regions (multi-select)
+      if(selectedRegions.length>0){
+        filtered = filtered.map(s=>{
+          const filteredRecords = s.records.filter(r=>{
+            const reg = regionOf(r.station) || '未分配';
+            return selectedRegions.includes(reg);
+          });
+          if(filteredRecords.length===0) return null;
+          return { ...s, records: filteredRecords };
+        }).filter(Boolean);
+      }
+
+      // Filter by station search
+      if(stationSearch){
+        filtered = filtered.map(s=>{
+          const filteredRecords = s.records.filter(r=> r.station.toLowerCase().includes(stationSearch));
+          if(filteredRecords.length===0) return null;
+          return { ...s, records: filteredRecords };
+        }).filter(Boolean);
+      }
+
+      return filtered;
+    }
+
+    // Aggregate data: key -> date -> {rep, pick}
+    function buildAggregatedMap(snaps){
+      const map = new Map();
+      snaps.forEach(s=>{
+        s.records.forEach(r=>{
+          const date = r.orderDate || s.orderDate || '';
+          const k = keyOf(r);
+          if(!map.has(k)) map.set(k, new Map());
+          const dateMap = map.get(k);
+          if(!dateMap.has(date)) dateMap.set(date, {rep:0, pick:0});
+          const entry = dateMap.get(date);
+          if(s.type==='replenish') entry.rep += r.qty;
+          else entry.pick += r.qty;
+        });
+      });
+      return map;
+    }
+
+    if(typeFilter==='both'){
+      // "补货+领用" mode: show both quantities
+      const filtered = filterRecords(snapshots, 'both');
+      if(filtered.length===0){
+        metaEl.textContent = '所选条件内暂无数据';
+        tableWrap.innerHTML = `<div class="empty-state"><div class="em-ic">▤</div>所选条件内暂无数据</div>`;
+        document.getElementById('snapPageInfo').textContent = '';
+        document.getElementById('snapPageBtns').innerHTML = '';
+        return;
+      }
+
+      const map = buildAggregatedMap(filtered);
+      const colLabel = dim==='region'?'大区':'柜机';
+
+      if(snapViewMode==='detail'){
+        // Detail: key + date + repQty + pickQty
+        let rows = [];
+        map.forEach((dateMap, k)=>{
+          const sortedDates = Array.from(dateMap.keys()).sort();
+          sortedDates.forEach(date=>{
+            const entry = dateMap.get(date);
+            rows.push({key:k, date, repQty:entry.rep, pickQty:entry.pick});
+          });
+        });
+        rows.sort((a,b)=> a.date.localeCompare(b.date) || b.key.localeCompare(a.key));
+
+        const totalRep = rows.reduce((s,r)=>s+r.repQty,0);
+        const totalPick = rows.reduce((s,r)=>s+r.pickQty,0);
+        const uniqueKeys = new Set(rows.map(r=>r.key));
+        metaEl.textContent = `数据类型：补货+领用 · 日期：${dateStart||'不限'}~${dateEnd||'不限'} · ${uniqueKeys.size} ${dim==='region'?'个大区':'台柜机'} · 补货合计 ${fmt(totalRep)} · 领用合计 ${fmt(totalPick)} · 详情数据`;
+
+        // Paginate
+        const totalRows = rows.length;
+        renderPagination(totalRows, ()=>renderSnapshotStats(false));
+        const startIdx = (snapCurrentPage-1)*snapPageSize;
+        const pageRows = rows.slice(startIdx, startIdx+snapPageSize);
+
+        tableWrap.innerHTML = `<table class="data"><thead><tr>
+          <th>${colLabel}名称</th><th>日期</th><th class="num">补货数量</th><th class="num">领用数量</th>
+          </tr></thead><tbody>` +
+          pageRows.map(r=>`<tr><td>${esc(r.key)}</td><td>${esc(r.date||'—')}</td><td class="num">${fmt(r.repQty)}</td><td class="num">${fmt(r.pickQty)}</td></tr>`).join('') +
+          `</tbody></table>`;
+
+        window.__snapExportRows = rows.map(r=>({
+          [colLabel+'名称']: r.key,
+          '日期': r.date,
+          '补货数量': r.repQty,
+          '领用数量': r.pickQty
+        }));
+        // Always save detail all for export
+        window.__snapExportDetailAll = rows.map(r=>({
+          [colLabel+'名称']: r.key,
+          '日期': r.date,
+          '补货数量': r.repQty,
+          '领用数量': r.pickQty
+        }));
+
+        // Also compute aggregate for export (always both rep+pick)
+        let aggRows = [];
+        map.forEach((dateMap, k)=>{
+          let totalRep = 0, totalPick = 0;
+          dateMap.forEach(entry=>{ totalRep += entry.rep; totalPick += entry.pick; });
+          aggRows.push({key:k, totalRep, totalPick});
+        });
+        aggRows.sort((a,b)=> (b.totalRep+b.totalPick) - (a.totalRep+a.totalPick));
+        window.__snapExportAggAll = aggRows.map(r=>({
+          [colLabel+'名称']: r.key,
+          '补货合计数量': r.totalRep,
+          '领用合计数量': r.totalPick
+        }));
+
+      } else {
+        // Aggregate: key + totalRep + totalPick
+        let rows = [];
+        map.forEach((dateMap, k)=>{
+          let totalRep = 0, totalPick = 0;
+          dateMap.forEach(entry=>{ totalRep += entry.rep; totalPick += entry.pick; });
+          rows.push({key:k, totalRep, totalPick});
+        });
+        rows.sort((a,b)=> (b.totalRep+b.totalPick) - (a.totalRep+a.totalPick));
+
+        const totalRep = rows.reduce((s,r)=>s+r.totalRep,0);
+        const totalPick = rows.reduce((s,r)=>s+r.totalPick,0);
+        metaEl.textContent = `数据类型：补货+领用 · 日期：${dateStart||'不限'}~${dateEnd||'不限'} · ${rows.length} ${dim==='region'?'个大区':'台柜机'} · 补货合计 ${fmt(totalRep)} · 领用合计 ${fmt(totalPick)} · 聚合统计`;
+
+        const totalRows = rows.length;
+        renderPagination(totalRows, ()=>renderSnapshotStats(false));
+        const startIdx = (snapCurrentPage-1)*snapPageSize;
+        const pageRows = rows.slice(startIdx, startIdx+snapPageSize);
+
+        tableWrap.innerHTML = `<table class="data"><thead><tr>
+          <th>${colLabel}名称</th><th class="num">补货合计数量</th><th class="num">领用合计数量</th>
+          </tr></thead><tbody>` +
+          pageRows.map(r=>`<tr><td>${esc(r.key)}</td><td class="num">${fmt(r.totalRep)}</td><td class="num">${fmt(r.totalPick)}</td></tr>`).join('') +
+          `</tbody></table>`;
+
+        window.__snapExportRows = rows.map(r=>({
+          [colLabel+'名称']: r.key,
+          '补货合计数量': r.totalRep,
+          '领用合计数量': r.totalPick
+        }));
+        // Always save aggregate for export
+        window.__snapExportAggAll = rows.map(r=>({
+          [colLabel+'名称']: r.key,
+          '补货合计数量': r.totalRep,
+          '领用合计数量': r.totalPick
+        }));
+
+        // Also compute detail for export
+        let detailRows = [];
+        map.forEach((dateMap, k)=>{
+          const sortedDates = Array.from(dateMap.keys()).sort();
+          sortedDates.forEach(date=>{
+            const entry = dateMap.get(date);
+            detailRows.push({key:k, date, repQty:entry.rep, pickQty:entry.pick});
+          });
+        });
+        detailRows.sort((a,b)=> a.date.localeCompare(b.date) || b.key.localeCompare(a.key));
+        window.__snapExportDetailAll = detailRows.map(r=>({
+          [colLabel+'名称']: r.key,
+          '日期': r.date,
+          '补货数量': r.repQty,
+          '领用数量': r.pickQty
+        }));
+      }
+
+    } else {
+      // Single type mode (only replenish or only pickup)
+      const filtered = filterRecords(snapshots, typeFilter);
+      if(filtered.length===0){
+        metaEl.textContent = '所选条件内暂无数据';
+        tableWrap.innerHTML = `<div class="empty-state"><div class="em-ic">▤</div>所选条件内暂无数据</div>`;
+        document.getElementById('snapPageInfo').textContent = '';
+        document.getElementById('snapPageBtns').innerHTML = '';
+        return;
+      }
+
+      const map = buildAggregatedMap(filtered);
+      const colLabel = dim==='region'?'大区':'柜机';
+      const qtyField = typeFilter==='replenish' ? 'rep' : 'pick';
+      const typeLabel = TYPE_LABEL[typeFilter];
+
+      if(snapViewMode==='detail'){
+        let rows = [];
+        map.forEach((dateMap, k)=>{
+          const sortedDates = Array.from(dateMap.keys()).sort();
+          sortedDates.forEach(date=>{
+            rows.push({key:k, date, qty:dateMap.get(date)[qtyField]});
+          });
+        });
+        rows.sort((a,b)=> a.date.localeCompare(b.date) || b.qty - a.qty);
+
+        const totalSum = rows.reduce((s,r)=>s+r.qty,0);
+        const uniqueKeys = new Set(rows.map(r=>r.key));
+        metaEl.textContent = `数据类型：${typeLabel} · 日期：${dateStart||'不限'}~${dateEnd||'不限'} · ${uniqueKeys.size} ${dim==='region'?'个大区':'台柜机'} · 合计 ${fmt(totalSum)} · 详情数据`;
+
+        const totalRows = rows.length;
+        renderPagination(totalRows, ()=>renderSnapshotStats(false));
+        const startIdx = (snapCurrentPage-1)*snapPageSize;
+        const pageRows = rows.slice(startIdx, startIdx+snapPageSize);
+
+        tableWrap.innerHTML = `<table class="data"><thead><tr>
+          <th>${colLabel}名称</th><th>日期</th><th class="num">${typeLabel}数量</th>
+          </tr></thead><tbody>` +
+          pageRows.map(r=>`<tr><td>${esc(r.key)}</td><td>${esc(r.date||'—')}</td><td class="num">${fmt(r.qty)}</td></tr>`).join('') +
+          `</tbody></table>`;
+
+        window.__snapExportRows = rows.map(r=>{
+          const obj = {};
+          obj[colLabel+'名称'] = r.key;
+          obj['日期'] = r.date;
+          obj[typeLabel+'数量'] = r.qty;
+          return obj;
+        });
+
+      } else {
+        let rows = [];
+        map.forEach((dateMap, k)=>{
+          let totalQty = 0;
+          dateMap.forEach(entry=>{ totalQty += entry[qtyField]; });
+          rows.push({key:k, totalQty});
+        });
+        rows.sort((a,b)=> b.totalQty - a.totalQty);
+
+        const totalSum = rows.reduce((s,r)=>s+r.totalQty,0);
+        metaEl.textContent = `数据类型：${typeLabel} · 日期：${dateStart||'不限'}~${dateEnd||'不限'} · ${rows.length} ${dim==='region'?'个大区':'台柜机'} · 合计 ${fmt(totalSum)} · 聚合统计`;
+
+        const totalRows = rows.length;
+        renderPagination(totalRows, ()=>renderSnapshotStats(false));
+        const startIdx = (snapCurrentPage-1)*snapPageSize;
+        const pageRows = rows.slice(startIdx, startIdx+snapPageSize);
+
+        tableWrap.innerHTML = `<table class="data"><thead><tr>
+          <th>${colLabel}名称</th><th class="num">${typeLabel}合计数量</th>
+          </tr></thead><tbody>` +
+          pageRows.map(r=>`<tr><td>${esc(r.key)}</td><td class="num">${fmt(r.totalQty)}</td></tr>`).join('') +
+          `</tbody></table>`;
+
+        window.__snapExportRows = rows.map(r=>{
+          const obj = {};
+          obj[colLabel+'名称'] = r.key;
+          obj[typeLabel+'合计数量'] = r.totalQty;
+          return obj;
+        });
+      }
+
+      // For export in single-type mode: always compute both rep+pick detail and aggregate
+      const bothFiltered = filterRecords(snapshots, 'both');
+      const bothMap = buildAggregatedMap(bothFiltered);
+      const colLabelExp = dim==='region'?'大区':'柜机';
+
+      // Detail for export
+      let expDetailRows = [];
+      bothMap.forEach((dateMap, k)=>{
+        const sortedDates = Array.from(dateMap.keys()).sort();
+        sortedDates.forEach(date=>{
+          const entry = dateMap.get(date);
+          expDetailRows.push({key:k, date, repQty:entry.rep, pickQty:entry.pick});
+        });
+      });
+      expDetailRows.sort((a,b)=> a.date.localeCompare(b.date) || b.key.localeCompare(a.key));
+      window.__snapExportDetailAll = expDetailRows.map(r=>({
+        [colLabelExp+'名称']: r.key,
+        '日期': r.date,
+        '补货数量': r.repQty,
+        '领用数量': r.pickQty
+      }));
+
+      // Aggregate for export
+      let expAggRows = [];
+      bothMap.forEach((dateMap, k)=>{
+        let totalRep = 0, totalPick = 0;
+        dateMap.forEach(entry=>{ totalRep += entry.rep; totalPick += entry.pick; });
+        expAggRows.push({key:k, totalRep, totalPick});
+      });
+      expAggRows.sort((a,b)=> (b.totalRep+b.totalPick) - (a.totalRep+a.totalPick));
+      window.__snapExportAggAll = expAggRows.map(r=>({
+        [colLabelExp+'名称']: r.key,
+        '补货合计数量': r.totalRep,
+        '领用合计数量': r.totalPick
+      }));
+    }
+  }
+
+  // Event listeners for stats tab - reset page on filter changes
+  document.getElementById('snapTypeFilter').addEventListener('change', ()=>renderSnapshotStats(true));
+  document.getElementById('snapDimFilter').addEventListener('change', ()=>renderSnapshotStats(true));
+  document.getElementById('snapRefreshBtn').addEventListener('click', ()=>renderSnapshotStats(true));
+  document.getElementById('snapStationSearch').addEventListener('input', ()=>renderSnapshotStats(true));
+
+  // View mode tabs
+  document.getElementById('snapViewTabs').addEventListener('click', (e)=>{
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    document.querySelectorAll('#snapViewTabs button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    snapViewMode = btn.dataset.view;
+    renderSnapshotStats(true);
+  });
+
+  document.getElementById('exportSnapBtn').addEventListener('click', ()=>{
+    const dateStart = document.getElementById('snapDateStart').value;
+    const dateEnd = document.getElementById('snapDateEnd').value;
+    const dim = document.getElementById('snapDimFilter').value;
+    const colLabel = dim==='region'?'大区':'柜机';
+    const dateRangeLabel = dateStart && dateEnd ? `${dateStart}~${dateEnd}` : '全部时间';
+
+    // Always compute from the current filtered data (rep + pick always)
+    const snapDetailRows = window.__snapExportDetailAll || [];
+    const snapAggRows = window.__snapExportAggAll || [];
+
+    if(snapDetailRows.length===0 && snapAggRows.length===0){
+      alert('暂无可导出的数据'); return;
+    }
+
+    const wb = XLSX.utils.book_new();
+
+    // Sheet1: 补货领用数据（详情明细）
+    if(snapDetailRows.length>0){
+      // Build data array with title as first row
+      const detailData = [];
+      detailData.push([`${dateRangeLabel} 补货领用数据`]); // title row
+      detailData.push([]); // blank row
+      // Header row
+      const detailHeaders = [colLabel+'名称', '日期', '补货数量', '领用数量'];
+      detailData.push(detailHeaders);
+      // Data rows
+      snapDetailRows.forEach(r=>{
+        detailData.push([r[colLabel+'名称']||'', r['日期']||'', r['补货数量']||0, r['领用数量']||0]);
+      });
+      const ws1 = XLSX.utils.aoa_to_sheet(detailData);
+      ws1['!cols'] = [{wch:22},{wch:14},{wch:14},{wch:14}];
+      // Merge title across columns
+      ws1['!merges'] = [{s:{r:0,c:0}, e:{r:0,c:3}}];
+      XLSX.utils.book_append_sheet(wb, ws1, '补货领用数据');
+    }
+
+    // Sheet2: 统计数据（聚合汇总）
+    if(snapAggRows.length>0){
+      const aggData = [];
+      aggData.push([`${dateRangeLabel} 统计数据`]);
+      aggData.push([]);
+      const aggHeaders = [colLabel+'名称', '补货合计数量', '领用合计数量'];
+      aggData.push(aggHeaders);
+      snapAggRows.forEach(r=>{
+        aggData.push([r[colLabel+'名称']||'', r['补货合计数量']||0, r['领用合计数量']||0]);
+      });
+      const ws2 = XLSX.utils.aoa_to_sheet(aggData);
+      ws2['!cols'] = [{wch:22},{wch:16},{wch:16}];
+      ws2['!merges'] = [{s:{r:0,c:0}, e:{r:0,c:2}}];
+      XLSX.utils.book_append_sheet(wb, ws2, '统计数据');
+    }
+
+    XLSX.writeFile(wb, `${dateRangeLabel} 补货领用数据.xlsx`);
+  });
+
+  /* ===================== github sync ===================== */
+  const K_GH = 'mro_github_settings';
+
+  function loadGhSettings(){ try{ return JSON.parse(localStorage.getItem(K_GH)) || {}; }catch(e){ return {}; } }
+  function saveGhSettings(s){ localStorage.setItem(K_GH, JSON.stringify(s)); }
+
+  function fillGhSettings(){
+    const s = loadGhSettings();
+    document.getElementById('ghToken').value = s.token || '';
+    document.getElementById('ghRepo').value = s.repo || '';
+    document.getElementById('ghPath').value = s.path || 'data.json';
+    document.getElementById('ghBranch').value = s.branch || 'main';
+  }
+
+  function ghStatus(kind, msg){
+    const el = document.getElementById('syncBanner');
+    el.innerHTML = `<div class="banner ${kind}">${msg}</div>`;
+  }
+
+  function ghInputs(){
+    const token = document.getElementById('ghToken').value.trim();
+    const repo = document.getElementById('ghRepo').value.trim();
+    const path = document.getElementById('ghPath').value.trim() || 'data.json';
+    const branch = document.getElementById('ghBranch').value.trim() || 'main';
+    if(!token || !repo || !path || !branch) throw new Error('请先填写完整同步设置');
+    saveGhSettings({token, repo, path, branch});
+    return {token, repo, path, branch};
+  }
+
+  async function ghFetch(url, token, opts={}){
+    const headers = {
+      'Accept': 'application/vnd.github+json',
+      'Authorization': `token ${token}`,
+      'X-GitHub-Api-Version': '2022-11-28'
+    };
+    if(opts.body) headers['Content-Type'] = 'application/json';
+    return fetch(url, Object.assign({}, opts, {headers}));
+  }
+
+  function utf8ToBase64(str){
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+  function base64ToUtf8(str){
+    return decodeURIComponent(escape(atob(str)));
+  }
+
+  async function pullFromGitHub(){
+    const {token, repo, path, branch} = ghInputs();
+    const [owner, repoName] = repo.split('/').filter(Boolean);
+    if(!owner || !repoName) throw new Error('仓库格式应为：用户名/仓库名');
+    const url = `https://api.github.com/repos/${owner}/${repoName}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(branch)}`;
+    const res = await ghFetch(url, token);
+    if(res.status === 404) throw new Error('仓库或文件不存在，请检查设置；首次使用可点击"上传到 GitHub"');
+    if(!res.ok) throw new Error(`拉取失败 ${res.status}: ${await res.text()}`);
+    const json = await res.json();
+    const text = base64ToUtf8(json.content);
+    const data = JSON.parse(text);
+    if(!data || typeof data !== 'object') throw new Error('云端数据格式不正确');
+    if(Array.isArray(data.mapping)) mapping = data.mapping; else mapping = [];
+    if(Array.isArray(data.snapshots)) snapshots = data.snapshots; else snapshots = [];
+    saveMapping(mapping);
+    saveSnapshots(snapshots);
+    renderHistory();
+    renderMapping();
+    renderStatsTab();
+    ghStatus('ok', `拉取成功：mapping ${mapping.length} 条，snapshots ${snapshots.length} 条`);
+    return json.sha;
+  }
+
+  async function pushToGitHub(){
+    const {token, repo, path, branch} = ghInputs();
+    const [owner, repoName] = repo.split('/').filter(Boolean);
+    if(!owner || !repoName) throw new Error('仓库格式应为：用户名/仓库名');
+    const payload = { mapping, snapshots };
+    const b64 = utf8ToBase64(JSON.stringify(payload, null, 2));
+    const url = `https://api.github.com/repos/${owner}/${repoName}/contents/${encodeURIComponent(path)}`;
+    let sha = null;
+    const getRes = await ghFetch(`${url}?ref=${encodeURIComponent(branch)}`, token);
+    if(getRes.ok){
+      const j = await getRes.json();
+      sha = j.sha;
+    }
+    const body = { message: 'update cabinet data', content: b64, branch };
+    if(sha) body.sha = sha;
+    const res = await ghFetch(url, token, { method: 'PUT', body: JSON.stringify(body) });
+    if(!res.ok) throw new Error(`上传失败 ${res.status}: ${await res.text()}`);
+    const json = await res.json();
+    ghStatus('ok', `上传成功：commit ${json.commit && json.commit.sha ? json.commit.sha.slice(0,7) : '—'}`);
+  }
+
+  async function testGitHub(){
+    const {token} = ghInputs();
+    const res = await ghFetch('https://api.github.com/user', token);
+    if(!res.ok) throw new Error(`Token 验证失败 ${res.status}`);
+    const j = await res.json();
+    ghStatus('ok', `Token 有效：${j.login}（${j.name || '无昵称'}）`);
+  }
+
+  function renderSyncPage(){
+    fillGhSettings();
+    document.getElementById('syncBanner').innerHTML = '';
+  }
+
+  document.getElementById('pullFromGitHub').addEventListener('click', async ()=>{
+    ghStatus('warn', '正在从 GitHub 拉取数据…');
+    try{ await pullFromGitHub(); }catch(e){ ghStatus('err', e.message); }
+  });
+
+  document.getElementById('pushToGitHub').addEventListener('click', async ()=>{
+    if(!snapshots.length && !mapping.length){
+      ghStatus('warn', '当前没有 mapping / snapshots 数据可上传'); return;
+    }
+    if(!confirm('上传会覆盖 GitHub 仓库中的数据文件，确认继续？')) return;
+    ghStatus('warn', '正在上传到 GitHub…');
+    try{ await pushToGitHub(); }catch(e){ ghStatus('err', e.message); }
+  });
+
+  document.getElementById('testGitHub').addEventListener('click', async ()=>{
+    ghStatus('warn', '正在验证 Token…');
+    try{ await testGitHub(); }catch(e){ ghStatus('err', e.message); }
+  });
+
+  /* ===================== init ===================== */
+  renderStatsTab();
+})();
+</script>
+</body>
+</html>
