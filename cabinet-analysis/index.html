@@ -92,6 +92,7 @@
   .page{ display:none; animation:fade .25s ease; }
   .page.active{ display:block; }
   @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.4;} }
 
   .page-head{ margin-bottom:22px; }
   .page-head h1{ font-size:21px; margin:0 0 4px; color:var(--navy-dark); }
@@ -453,15 +454,15 @@
     <!-- ============ GITHUB SYNC ============ -->
     <section class="page" id="page-sync">
       <div class="page-head">
-        <h1>GitHub 云同步</h1>
-        <p>通过 GitHub 仓库保存 mapping 和 snapshots，实现跨设备数据同步</p>
+        <h1>GitHub 实时云同步</h1>
+        <p>配置一次，数据自动实时同步到 GitHub，无需手动操作</p>
       </div>
       <div class="card">
         <div class="card-pad">
           <div class="grid-2">
             <label class="field">
               <span class="lbl">GitHub 仓库（格式：用户名/仓库名）</span>
-              <input type="text" id="ghRepo" placeholder="例如：Jasonlee911/cabinet-data">
+              <input type="text" id="ghRepo" placeholder="例如：Jasonlee911/lee-s-warehouse">
             </label>
             <label class="field">
               <span class="lbl">Personal Access Token</span>
@@ -477,12 +478,11 @@
             </label>
           </div>
           <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-primary" id="testGitHub">测试 Token</button>
-            <button class="btn btn-accent" id="pullFromGitHub">从 GitHub 拉取</button>
-            <button class="btn btn-ghost" id="pushToGitHub">上传到 GitHub</button>
+            <button class="btn btn-primary" id="ghSaveSettings">保存并连接</button>
+            <button class="btn btn-ghost" id="ghDisconnect" style="display:none;">断开连接</button>
           </div>
+          <div id="syncStatus" style="margin-top:12px;"></div>
           <div class="mini-note">Token 只保存在当前浏览器 localStorage 中，不会被上传到代码仓库。建议将 GitHub 仓库设为 Private，避免数据泄露。</div>
-          <div id="syncBanner"></div>
         </div>
       </div>
     </section>
@@ -1477,30 +1477,26 @@
   /* ===================== github sync ===================== */
   const K_GH = 'mro_github_settings';
 
+  let ghConnected = false;
+  let ghLastSha = null;        // latest file sha from GitHub
+  let ghAutoPushTimer = null;  // debounce timer for auto push
+
   function loadGhSettings(){ try{ return JSON.parse(localStorage.getItem(K_GH)) || {}; }catch(e){ return {}; } }
   function saveGhSettings(s){ localStorage.setItem(K_GH, JSON.stringify(s)); }
 
-  function fillGhSettings(){
+  function ghSettings(){
     const s = loadGhSettings();
-    document.getElementById('ghToken').value = s.token || '';
-    document.getElementById('ghRepo').value = s.repo || '';
-    document.getElementById('ghPath').value = s.path || 'data.json';
-    document.getElementById('ghBranch').value = s.branch || 'main';
+    if(!s.token || !s.repo) return null;
+    return { token:s.token, repo:s.repo, path:s.path||'data.json', branch:s.branch||'main' };
   }
 
   function ghStatus(kind, msg){
-    const el = document.getElementById('syncBanner');
-    el.innerHTML = `<div class="banner ${kind}">${msg}</div>`;
-  }
-
-  function ghInputs(){
-    const token = document.getElementById('ghToken').value.trim();
-    const repo = document.getElementById('ghRepo').value.trim();
-    const path = document.getElementById('ghPath').value.trim() || 'data.json';
-    const branch = document.getElementById('ghBranch').value.trim() || 'main';
-    if(!token || !repo || !path || !branch) throw new Error('请先填写完整同步设置');
-    saveGhSettings({token, repo, path, branch});
-    return {token, repo, path, branch};
+    const el = document.getElementById('syncStatus');
+    if(!el) return;
+    const colors = { ok:'#4caf50', warn:'#ff9800', err:'#f44336', info:'#2196f3' };
+    el.innerHTML = `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;background:${colors[kind]||'#888'}15;border-left:3px solid ${colors[kind]||'#888'};font-size:13px;">` +
+      `<span style="width:8px;height:8px;border-radius:50%;background:${colors[kind]||'#888'};flex-shrink:0;${kind==='ok'?'animation:pulse 2s infinite;':''}"></span>` +
+      `<span>${msg}</span></div>`;
   }
 
   async function ghFetch(url, token, opts={}){
@@ -1520,84 +1516,207 @@
     return decodeURIComponent(escape(atob(str)));
   }
 
-  async function pullFromGitHub(){
-    const {token, repo, path, branch} = ghInputs();
-    const [owner, repoName] = repo.split('/').filter(Boolean);
-    if(!owner || !repoName) throw new Error('仓库格式应为：用户名/仓库名');
-    const url = `https://api.github.com/repos/${owner}/${repoName}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(branch)}`;
-    const res = await ghFetch(url, token);
-    if(res.status === 404) throw new Error('仓库或文件不存在，请检查设置；首次使用可点击"上传到 GitHub"');
-    if(!res.ok) throw new Error(`拉取失败 ${res.status}: ${await res.text()}`);
+  /* ----- pull from GitHub ----- */
+  async function ghPull(silent){
+    const s = ghSettings(); if(!s) return;
+    const [owner, repoName] = s.repo.split('/').filter(Boolean);
+    if(!owner || !repoName) return;
+    const url = `https://api.github.com/repos/${owner}/${repoName}/contents/${encodeURIComponent(s.path)}?ref=${encodeURIComponent(s.branch)}`;
+    const res = await ghFetch(url, s.token);
+    if(res.status === 404){
+      if(!silent) ghStatus('warn','云端暂无数据文件，首次上传后将自动同步');
+      return;
+    }
+    if(!res.ok){
+      if(!silent) ghStatus('err',`拉取失败 ${res.status}`);
+      return;
+    }
     const json = await res.json();
     const text = base64ToUtf8(json.content);
     const data = JSON.parse(text);
-    if(!data || typeof data !== 'object') throw new Error('云端数据格式不正确');
-    if(Array.isArray(data.mapping)) mapping = data.mapping; else mapping = [];
-    if(Array.isArray(data.snapshots)) snapshots = data.snapshots; else snapshots = [];
-    saveMapping(mapping);
-    saveSnapshots(snapshots);
+    if(!data || typeof data !== 'object') return;
+    if(Array.isArray(data.mapping)) mapping = data.mapping;
+    if(Array.isArray(data.snapshots)) snapshots = data.snapshots;
+    ghLastSha = json.sha;
+    saveMappingLocal(mapping);
+    saveSnapshotsLocal(snapshots);
     renderHistory();
     renderMapping();
     renderStatsTab();
-    ghStatus('ok', `拉取成功：mapping ${mapping.length} 条，snapshots ${snapshots.length} 条`);
-    return json.sha;
+    if(!silent) ghStatus('ok',`已同步云端数据 (mapping ${mapping.length}, snapshots ${snapshots.length})`);
   }
 
-  async function pushToGitHub(){
-    const {token, repo, path, branch} = ghInputs();
-    const [owner, repoName] = repo.split('/').filter(Boolean);
-    if(!owner || !repoName) throw new Error('仓库格式应为：用户名/仓库名');
+  /* ----- push to GitHub (auto) ----- */
+  async function ghPush(silent){
+    const s = ghSettings(); if(!s || !ghConnected) return;
+    const [owner, repoName] = s.repo.split('/').filter(Boolean);
+    if(!owner || !repoName) return;
     const payload = { mapping, snapshots };
     const b64 = utf8ToBase64(JSON.stringify(payload, null, 2));
-    const url = `https://api.github.com/repos/${owner}/${repoName}/contents/${encodeURIComponent(path)}`;
-    let sha = null;
-    const getRes = await ghFetch(`${url}?ref=${encodeURIComponent(branch)}`, token);
-    if(getRes.ok){
-      const j = await getRes.json();
-      sha = j.sha;
+    const url = `https://api.github.com/repos/${owner}/${repoName}/contents/${encodeURIComponent(s.path)}`;
+
+    // get latest sha if we don't have it
+    if(!ghLastSha){
+      const getRes = await ghFetch(`${url}?ref=${encodeURIComponent(s.branch)}`, s.token);
+      if(getRes.ok){
+        const j = await getRes.json();
+        ghLastSha = j.sha;
+      }
     }
-    const body = { message: 'update cabinet data', content: b64, branch };
-    if(sha) body.sha = sha;
-    const res = await ghFetch(url, token, { method: 'PUT', body: JSON.stringify(body) });
-    if(!res.ok) throw new Error(`上传失败 ${res.status}: ${await res.text()}`);
+
+    const body = { message: 'auto sync cabinet data', content: b64, branch: s.branch };
+    if(ghLastSha) body.sha = ghLastSha;
+
+    const res = await ghFetch(url, s.token, { method: 'PUT', body: JSON.stringify(body) });
+    if(!res.ok){
+      if(!silent) ghStatus('err',`自动同步失败 ${res.status}`);
+      return;
+    }
     const json = await res.json();
-    ghStatus('ok', `上传成功：commit ${json.commit && json.commit.sha ? json.commit.sha.slice(0,7) : '—'}`);
+    ghLastSha = json.content && json.content.sha ? json.content.sha : ghLastSha;
+    if(!silent) ghStatus('ok','数据已自动同步到 GitHub');
   }
 
-  async function testGitHub(){
-    const {token} = ghInputs();
-    const res = await ghFetch('https://api.github.com/user', token);
-    if(!res.ok) throw new Error(`Token 验证失败 ${res.status}`);
-    const j = await res.json();
-    ghStatus('ok', `Token 有效：${j.login}（${j.name || '无昵称'}）`);
+  /* ----- auto push with debounce (avoid too many API calls) ----- */
+  function ghAutoPush(){
+    if(!ghConnected) return;
+    clearTimeout(ghAutoPushTimer);
+    ghAutoPushTimer = setTimeout(()=> ghPush(true), 1500);
   }
 
-  function renderSyncPage(){
-    fillGhSettings();
-    document.getElementById('syncBanner').innerHTML = '';
-  }
+  /* ----- connect: save settings, verify token, pull data, mark connected ----- */
+  async function ghConnect(){
+    const token = document.getElementById('ghToken').value.trim();
+    const repo = document.getElementById('ghRepo').value.trim();
+    const path = document.getElementById('ghPath').value.trim() || 'data.json';
+    const branch = document.getElementById('ghBranch').value.trim() || 'main';
+    if(!token || !repo) { ghStatus('err','请填写 Token 和仓库名'); return; }
+    if(!repo.includes('/')) { ghStatus('err','仓库格式：用户名/仓库名'); return; }
 
-  document.getElementById('pullFromGitHub').addEventListener('click', async ()=>{
-    ghStatus('warn', '正在从 GitHub 拉取数据…');
-    try{ await pullFromGitHub(); }catch(e){ ghStatus('err', e.message); }
-  });
+    ghStatus('info','正在连接 GitHub...');
 
-  document.getElementById('pushToGitHub').addEventListener('click', async ()=>{
-    if(!snapshots.length && !mapping.length){
-      ghStatus('warn', '当前没有 mapping / snapshots 数据可上传'); return;
+    // verify token
+    const userRes = await ghFetch('https://api.github.com/user', token);
+    if(!userRes.ok){ ghStatus('err',`Token 验证失败 ${userRes.status}`); return; }
+    const user = await userRes.json();
+
+    // save settings
+    saveGhSettings({token, repo, path, branch});
+
+    // mark connected
+    ghConnected = true;
+    document.getElementById('ghSaveSettings').style.display = 'none';
+    document.getElementById('ghDisconnect').style.display = '';
+    document.getElementById('ghToken').disabled = true;
+    document.getElementById('ghRepo').disabled = true;
+    document.getElementById('ghPath').disabled = true;
+    document.getElementById('ghBranch').disabled = true;
+
+    ghStatus('ok',`已连接 GitHub (${user.login})，数据将自动实时同步`);
+
+    // pull latest data
+    await ghPull(true);
+
+    // push current data if empty remote
+    if(snapshots.length || mapping.length){
+      await ghPush(true);
     }
-    if(!confirm('上传会覆盖 GitHub 仓库中的数据文件，确认继续？')) return;
-    ghStatus('warn', '正在上传到 GitHub…');
-    try{ await pushToGitHub(); }catch(e){ ghStatus('err', e.message); }
-  });
+  }
 
-  document.getElementById('testGitHub').addEventListener('click', async ()=>{
-    ghStatus('warn', '正在验证 Token…');
-    try{ await testGitHub(); }catch(e){ ghStatus('err', e.message); }
+  /* ----- disconnect ----- */
+  function ghDisconnect(){
+    ghConnected = false;
+    ghLastSha = null;
+    clearTimeout(ghAutoPushTimer);
+    document.getElementById('ghSaveSettings').style.display = '';
+    document.getElementById('ghDisconnect').style.display = 'none';
+    document.getElementById('ghToken').disabled = false;
+    document.getElementById('ghRepo').disabled = false;
+    document.getElementById('ghPath').disabled = false;
+    document.getElementById('ghBranch').disabled = false;
+    ghStatus('info','已断开 GitHub 连接');
+  }
+
+  /* ----- auto-connect on page load if settings exist ----- */
+  async function ghAutoConnect(){
+    const s = ghSettings();
+    if(!s) return;
+
+    // fill form
+    document.getElementById('ghToken').value = s.token || '';
+    document.getElementById('ghRepo').value = s.repo || '';
+    document.getElementById('ghPath').value = s.path || 'data.json';
+    document.getElementById('ghBranch').value = s.branch || 'main';
+
+    // verify and connect
+    const userRes = await ghFetch('https://api.github.com/user', s.token);
+    if(!userRes.ok) return; // token invalid, stay disconnected
+
+    ghConnected = true;
+    document.getElementById('ghSaveSettings').style.display = 'none';
+    document.getElementById('ghDisconnect').style.display = '';
+    document.getElementById('ghToken').disabled = true;
+    document.getElementById('ghRepo').disabled = true;
+    document.getElementById('ghPath').disabled = true;
+    document.getElementById('ghBranch').disabled = true;
+
+    const user = await userRes.json();
+    ghStatus('ok',`已连接 GitHub (${user.login})，数据实时同步中`);
+
+    // pull latest
+    await ghPull(true);
+  }
+
+  /* ----- wrap save functions: local save + auto push ----- */
+  function saveMappingLocal(list){ localStorage.setItem(K_MAP, JSON.stringify(list)); }
+  function saveSnapshotsLocal(list){ localStorage.setItem(K_SNAP, JSON.stringify(list)); }
+
+  // override global save functions to auto-sync
+  const _origSaveMapping = saveMapping;
+  const _origSaveSnapshots = saveSnapshots;
+  saveMapping = function(list){
+    _origSaveMapping(list);
+    ghAutoPush();
+  };
+  saveSnapshots = function(list){
+    _origSaveSnapshots(list);
+    ghAutoPush();
+  };
+
+  /* ----- render sync page ----- */
+  function renderSyncPage(){
+    const s = ghSettings();
+    document.getElementById('ghToken').value = s.token || '';
+    document.getElementById('ghRepo').value = s.repo || '';
+    document.getElementById('ghPath').value = s.path || 'data.json';
+    document.getElementById('ghBranch').value = s.branch || 'main';
+
+    if(ghConnected){
+      document.getElementById('ghSaveSettings').style.display = 'none';
+      document.getElementById('ghDisconnect').style.display = '';
+      document.getElementById('ghToken').disabled = true;
+      document.getElementById('ghRepo').disabled = true;
+      document.getElementById('ghPath').disabled = true;
+      document.getElementById('ghBranch').disabled = true;
+    } else {
+      document.getElementById('ghSaveSettings').style.display = '';
+      document.getElementById('ghDisconnect').style.display = 'none';
+      document.getElementById('ghToken').disabled = false;
+      document.getElementById('ghRepo').disabled = false;
+      document.getElementById('ghPath').disabled = false;
+      document.getElementById('ghBranch').disabled = false;
+    }
+  }
+
+  /* ----- event bindings ----- */
+  document.getElementById('ghSaveSettings').addEventListener('click', ()=>{
+    ghConnect().catch(e=> ghStatus('err',e.message));
   });
+  document.getElementById('ghDisconnect').addEventListener('click', ghDisconnect);
 
   /* ===================== init ===================== */
   renderStatsTab();
+  ghAutoConnect().catch(()=>{}); // auto-connect silently
 })();
 </script>
 </body>
