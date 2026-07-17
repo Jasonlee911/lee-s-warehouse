@@ -97,5 +97,692 @@
       "region": "西南区"
     }
   ],
-  "snapshots": []
+  "snapshots": [
+    {
+      "id": "idmrot4wy3o0q6y6",
+      "importTime": "2026-07-17T10:40:59.595Z",
+      "type": "pickup",
+      "fileName": "领用记录.xlsx",
+      "orderDate": "2026-07-01",
+      "records": [
+        {
+          "station": "山西顺丰-重力开门柜",
+          "qty": 15,
+          "orderDate": "2026-07-16"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 45,
+          "orderDate": "2026-07-16"
+        },
+        {
+          "station": "上虹货架01",
+          "qty": 1397,
+          "orderDate": "2026-07-16"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 23432,
+          "orderDate": "2026-07-16"
+        },
+        {
+          "station": "一鼎智能柜01",
+          "qty": 1072,
+          "orderDate": "2026-07-16"
+        },
+        {
+          "station": "丹氏智能开门柜",
+          "qty": 844,
+          "orderDate": "2026-07-16"
+        },
+        {
+          "station": "丰巢前海大厦-重力开门柜",
+          "qty": 1,
+          "orderDate": "2026-07-16"
+        },
+        {
+          "station": "顺丰创智大厦2号柜",
+          "qty": 30,
+          "orderDate": "2026-07-16"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 35,
+          "orderDate": "2026-07-16"
+        },
+        {
+          "station": "晋正002",
+          "qty": 38,
+          "orderDate": "2026-07-16"
+        },
+        {
+          "station": "唐山贺祥智能科技有限公司",
+          "qty": 69,
+          "orderDate": "2026-07-16"
+        },
+        {
+          "station": "金丰速运有限公司",
+          "qty": 2,
+          "orderDate": "2026-07-16"
+        },
+        {
+          "station": "渝北转运中心-开方式货架",
+          "qty": 6,
+          "orderDate": "2026-07-16"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 34,
+          "orderDate": "2026-07-15"
+        },
+        {
+          "station": "丹氏智能开门柜",
+          "qty": 821,
+          "orderDate": "2026-07-15"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 74,
+          "orderDate": "2026-07-15"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 20943,
+          "orderDate": "2026-07-15"
+        },
+        {
+          "station": "顺丰河南郑州371W备件库",
+          "qty": 3,
+          "orderDate": "2026-07-15"
+        },
+        {
+          "station": "顺丰创智大厦2号柜",
+          "qty": 25,
+          "orderDate": "2026-07-15"
+        },
+        {
+          "station": "华东分拨中心2号柜",
+          "qty": 3,
+          "orderDate": "2026-07-15"
+        },
+        {
+          "station": "上虹货架01",
+          "qty": 204,
+          "orderDate": "2026-07-15"
+        },
+        {
+          "station": "山西顺丰-重力开门柜",
+          "qty": 5,
+          "orderDate": "2026-07-15"
+        },
+        {
+          "station": "唐山贺祥智能科技有限公司",
+          "qty": 5,
+          "orderDate": "2026-07-15"
+        },
+        {
+          "station": "晋正001",
+          "qty": 746,
+          "orderDate": "2026-07-15"
+        },
+        {
+          "station": "晋正002",
+          "qty": 1,
+          "orderDate": "2026-07-15"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 61,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "福州顺丰转运中心",
+          "qty": 41,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 42,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "宁波佳利燃器-开门式重力货架",
+          "qty": 4,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "丰巢前海大厦-重力开门柜",
+          "qty": 6,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "山西顺丰-重力开门柜",
+          "qty": 21,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "昆明官渡转运中心（开放式重力货架）2号柜",
+          "qty": 3,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 28431,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "顺丰创智大厦2号柜",
+          "qty": 13,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "晋正002",
+          "qty": 419,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "华东分拨中心2号柜",
+          "qty": 4,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "丹氏智能开门柜",
+          "qty": 1161,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 44,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "山西顺丰-重力开门柜",
+          "qty": 8,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 23721,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "渝北转运中心-开方式货架",
+          "qty": 29,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "顺丰创智大厦2号柜",
+          "qty": 39,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "一鼎智能柜01",
+          "qty": 432,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "顺丰河南郑州371W备件库",
+          "qty": 2,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "金丰速运有限公司",
+          "qty": 6,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 16,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "华东分拨中心1号柜",
+          "qty": 2,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "丰巢前海大厦-重力开门柜",
+          "qty": 2,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "丰巢展厅(测试)-开放式货架",
+          "qty": 5,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "晋正002",
+          "qty": 367,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "山西顺丰-重力开门柜",
+          "qty": 6,
+          "orderDate": "2026-07-12"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 5,
+          "orderDate": "2026-07-12"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 1,
+          "orderDate": "2026-07-12"
+        },
+        {
+          "station": "一鼎智能柜01",
+          "qty": 322,
+          "orderDate": "2026-07-12"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 7,
+          "orderDate": "2026-07-12"
+        },
+        {
+          "station": "丹氏智能开门柜",
+          "qty": 3091,
+          "orderDate": "2026-07-11"
+        },
+        {
+          "station": "上虹货架01",
+          "qty": 19662,
+          "orderDate": "2026-07-11"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 25234,
+          "orderDate": "2026-07-11"
+        },
+        {
+          "station": "晋正002",
+          "qty": 413,
+          "orderDate": "2026-07-11"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 2,
+          "orderDate": "2026-07-11"
+        },
+        {
+          "station": "上虹货架01",
+          "qty": 184,
+          "orderDate": "2026-07-10"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 25363,
+          "orderDate": "2026-07-10"
+        },
+        {
+          "station": "丹氏智能开门柜",
+          "qty": 1906,
+          "orderDate": "2026-07-10"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 60,
+          "orderDate": "2026-07-10"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 40,
+          "orderDate": "2026-07-10"
+        },
+        {
+          "station": "顺丰河南郑州371W备件库",
+          "qty": 22,
+          "orderDate": "2026-07-10"
+        },
+        {
+          "station": "华东分拨中心1号柜",
+          "qty": 1,
+          "orderDate": "2026-07-10"
+        },
+        {
+          "station": "山西顺丰-重力开门柜",
+          "qty": 2,
+          "orderDate": "2026-07-10"
+        },
+        {
+          "station": "丹氏智能科技",
+          "qty": 10,
+          "orderDate": "2026-07-10"
+        },
+        {
+          "station": "晋正002",
+          "qty": 692,
+          "orderDate": "2026-07-10"
+        },
+        {
+          "station": "丹氏智能科技",
+          "qty": 102,
+          "orderDate": "2026-07-09"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 59,
+          "orderDate": "2026-07-09"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 21073,
+          "orderDate": "2026-07-09"
+        },
+        {
+          "station": "上虹货架01",
+          "qty": 57,
+          "orderDate": "2026-07-09"
+        },
+        {
+          "station": "丹氏智能开门柜",
+          "qty": 104,
+          "orderDate": "2026-07-09"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 154,
+          "orderDate": "2026-07-09"
+        },
+        {
+          "station": "龙里中转场",
+          "qty": 20,
+          "orderDate": "2026-07-09"
+        },
+        {
+          "station": "华东分拨中心1号柜",
+          "qty": 8,
+          "orderDate": "2026-07-09"
+        },
+        {
+          "station": "晋正002",
+          "qty": 395,
+          "orderDate": "2026-07-09"
+        },
+        {
+          "station": "丹氏智能科技",
+          "qty": 63,
+          "orderDate": "2026-07-08"
+        },
+        {
+          "station": "北京顺丰速运有限公司",
+          "qty": 66003,
+          "orderDate": "2026-07-08"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 52,
+          "orderDate": "2026-07-08"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 60,
+          "orderDate": "2026-07-08"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 31624,
+          "orderDate": "2026-07-08"
+        },
+        {
+          "station": "上虹货架01",
+          "qty": 134,
+          "orderDate": "2026-07-08"
+        },
+        {
+          "station": "山西顺丰-重力开门柜",
+          "qty": 5,
+          "orderDate": "2026-07-08"
+        },
+        {
+          "station": "晋正002",
+          "qty": 259,
+          "orderDate": "2026-07-08"
+        },
+        {
+          "station": "上虹货架01",
+          "qty": 95,
+          "orderDate": "2026-07-07"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 33625,
+          "orderDate": "2026-07-07"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 94,
+          "orderDate": "2026-07-07"
+        },
+        {
+          "station": "丹氏智能科技",
+          "qty": 126,
+          "orderDate": "2026-07-07"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 49,
+          "orderDate": "2026-07-07"
+        },
+        {
+          "station": "晋正002",
+          "qty": 157,
+          "orderDate": "2026-07-07"
+        },
+        {
+          "station": "一鼎智能柜01",
+          "qty": 57,
+          "orderDate": "2026-07-07"
+        },
+        {
+          "station": "丰巢展厅(测试)-开放式货架",
+          "qty": 1,
+          "orderDate": "2026-07-07"
+        },
+        {
+          "station": "渝北转运中心-开方式货架",
+          "qty": 2,
+          "orderDate": "2026-07-07"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 94,
+          "orderDate": "2026-07-06"
+        },
+        {
+          "station": "丹氏智能科技",
+          "qty": 376,
+          "orderDate": "2026-07-06"
+        },
+        {
+          "station": "上虹货架01",
+          "qty": 1454,
+          "orderDate": "2026-07-06"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 46,
+          "orderDate": "2026-07-06"
+        },
+        {
+          "station": "渝北转运中心-开方式货架",
+          "qty": 13,
+          "orderDate": "2026-07-06"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 26270,
+          "orderDate": "2026-07-06"
+        },
+        {
+          "station": "晋正002",
+          "qty": 543,
+          "orderDate": "2026-07-06"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 13,
+          "orderDate": "2026-07-05"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 13,
+          "orderDate": "2026-07-05"
+        },
+        {
+          "station": "上虹货架01",
+          "qty": 2,
+          "orderDate": "2026-07-05"
+        },
+        {
+          "station": "丹氏智能科技",
+          "qty": 31,
+          "orderDate": "2026-07-05"
+        },
+        {
+          "station": "一鼎智能柜01",
+          "qty": 209,
+          "orderDate": "2026-07-05"
+        },
+        {
+          "station": "丹氏智能科技",
+          "qty": 29,
+          "orderDate": "2026-07-04"
+        },
+        {
+          "station": "晋正002",
+          "qty": 924,
+          "orderDate": "2026-07-04"
+        },
+        {
+          "station": "上虹货架01",
+          "qty": 83,
+          "orderDate": "2026-07-04"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 22913,
+          "orderDate": "2026-07-04"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 7,
+          "orderDate": "2026-07-04"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 4,
+          "orderDate": "2026-07-04"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 10,
+          "orderDate": "2026-07-03"
+        },
+        {
+          "station": "一鼎智能柜01",
+          "qty": 257,
+          "orderDate": "2026-07-03"
+        },
+        {
+          "station": "丹氏智能科技",
+          "qty": 10650,
+          "orderDate": "2026-07-03"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 53,
+          "orderDate": "2026-07-03"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 34803,
+          "orderDate": "2026-07-03"
+        },
+        {
+          "station": "晋正002",
+          "qty": 105,
+          "orderDate": "2026-07-03"
+        },
+        {
+          "station": "顺丰创智大厦2号柜",
+          "qty": 3,
+          "orderDate": "2026-07-03"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 102,
+          "orderDate": "2026-07-02"
+        },
+        {
+          "station": "丹氏智能科技",
+          "qty": 490,
+          "orderDate": "2026-07-02"
+        },
+        {
+          "station": "一鼎智能柜01",
+          "qty": 1009,
+          "orderDate": "2026-07-02"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 30417,
+          "orderDate": "2026-07-02"
+        },
+        {
+          "station": "晋正002",
+          "qty": 137,
+          "orderDate": "2026-07-02"
+        },
+        {
+          "station": "顺丰创智大厦2号柜",
+          "qty": 7,
+          "orderDate": "2026-07-02"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 3,
+          "orderDate": "2026-07-02"
+        },
+        {
+          "station": "上虹货架01",
+          "qty": 476,
+          "orderDate": "2026-07-02"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 112,
+          "orderDate": "2026-07-01"
+        },
+        {
+          "station": "丹氏智能科技",
+          "qty": 18,
+          "orderDate": "2026-07-01"
+        },
+        {
+          "station": "晋正002",
+          "qty": 63,
+          "orderDate": "2026-07-01"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 29818,
+          "orderDate": "2026-07-01"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 13,
+          "orderDate": "2026-07-01"
+        },
+        {
+          "station": "一鼎智能柜01",
+          "qty": 3822,
+          "orderDate": "2026-07-01"
+        }
+      ],
+      "stationCount": 135,
+      "totalQty": 501522
+    }
+  ]
 }
