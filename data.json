@@ -1,151 +1,101 @@
 {
-  "title": "MRO 产品路线图",
-  "year": 2026,
-  "startMonth": 6,
-  "endMonth": 11,
-  "tasks": [
+  "mapping": [
     {
-      "id": "t1",
-      "month": 0,
-      "title": "打通工单补货流程",
-      "sub": "将宸沣补货信息打通至丰巢工单系统，把控丰巢运维通过丰蜜补货流程",
-      "status": "done",
-      "progress": 100,
-      "notes": "",
-      "risk": false,
-      "order": 0
+      "station": "北京顺丰速运有限公司",
+      "region": "北京区"
     },
     {
-      "id": "t2",
-      "month": 0,
-      "title": "接入暂存柜暂存能力",
-      "sub": "将存取能力接入到mro中台，支持物流配送至暂存柜作为mro前置仓使用",
-      "status": "done",
-      "progress": 100,
-      "notes": "",
-      "risk": false,
-      "order": 1
+      "station": "丹氏智能开门柜",
+      "region": "苏南区"
     },
     {
-      "id": "t3",
-      "month": 1,
-      "title": "接入顺丰寄件能力",
-      "sub": "全链路补齐平台对接物流发货能力（路由轨迹跟踪）",
-      "status": "wip",
-      "progress": 80,
-      "notes": "",
-      "risk": false,
-      "order": 0
+      "station": "丹氏智能科技",
+      "region": "苏南区"
     },
     {
-      "id": "t4",
-      "month": 1,
-      "title": "外部迪卡依对接",
-      "sub": "将暂存柜存取能力独立给到迪卡依租赁业务使用",
-      "status": "wip",
-      "progress": 40,
-      "notes": "",
-      "risk": false,
-      "order": 1
+      "station": "丰巢前海大厦-重力开门柜",
+      "region": "粤东区"
     },
     {
-      "id": "t5",
-      "month": 1,
-      "title": "MRO管理系统标准化",
-      "sub": "mro全链路功能（sku管理、补货、领料、人员管理）接口化，并支持在丰巢mro管理后台查看数据",
-      "status": "wip",
-      "progress": 10,
-      "notes": "",
-      "risk": false,
-      "order": 2
+      "station": "丰巢展厅(测试)-开放式货架",
+      "region": "粤东区"
     },
     {
-      "id": "t6",
-      "month": 2,
-      "title": "MRO柜接入资产管理",
-      "sub": "将mro柜资产纳入到丰巢资产管理体系（mro柜选址、投放、激活全链路打通）",
-      "status": "todo",
-      "progress": 0,
-      "notes": "",
-      "risk": false,
-      "order": 0
+      "station": "福州顺丰转运中心",
+      "region": "东南区"
     },
     {
-      "id": "t7",
-      "month": 2,
-      "title": "MRO中台能力模块化",
-      "sub": "将暂存柜存取能力、补货能力、物流配送能力模块化输出，供客户选择",
-      "status": "todo",
-      "progress": 0,
-      "notes": "",
-      "risk": false,
-      "order": 1
+      "station": "华东分拨中心1号柜",
+      "region": "上海区"
     },
     {
-      "id": "t8",
-      "month": 3,
-      "title": "CRM商机管理",
-      "sub": "支持商机录入、跟进、完成全流程线上化，并支持后续进件、合同签署与归档线上化",
-      "status": "todo",
-      "progress": 0,
-      "notes": "",
-      "risk": false,
-      "order": 0
+      "station": "华东分拨中心2号柜",
+      "region": "上海区"
     },
     {
-      "id": "t9",
-      "month": 3,
-      "title": "账单管理",
-      "sub": "将柜机采购、sku采购、mro柜机分成形成定期账单，并支持自动对账功能",
-      "status": "todo",
-      "progress": 0,
-      "notes": "",
-      "risk": false,
-      "order": 1
+      "station": "金丰速运有限公司",
+      "region": "浙南区"
     },
     {
-      "id": "t10",
-      "month": 4,
-      "title": "MRO柜客户管理平台",
-      "sub": "统一对外的管理平台，客户可在此平台进行wms相关操作（sku管理、上下架管理、补货领料管理、物流管理）",
-      "status": "todo",
-      "progress": 0,
-      "notes": "",
-      "risk": false,
-      "order": 0
+      "station": "晋正001",
+      "region": "上海区"
     },
     {
-      "id": "t11",
-      "month": 4,
-      "title": "WMS数据看板",
-      "sub": "支持用户查看仓储、柜机、客户流水等数据",
-      "status": "todo",
-      "progress": 0,
-      "notes": "",
-      "risk": false,
-      "order": 1
+      "station": "晋正002",
+      "region": "上海区"
     },
     {
-      "id": "t12",
-      "month": 5,
-      "title": "成本透视看板",
-      "sub": "通过bi成本看板，看透成本结构，能清楚看到哪个部门、哪条产线、甚至哪个工人花了多少钱，直接对应「降本增效」",
-      "status": "todo",
-      "progress": 0,
-      "notes": "",
-      "risk": false,
-      "order": 0
+      "station": "昆明官渡转运中心（开放式重力货架）2号柜",
+      "region": "西南区"
     },
     {
-      "id": "t13",
-      "month": 5,
-      "title": "商机绩效管理",
-      "sub": "通过绩效规则引擎（配置层）、商机全链路追踪（数据层）、实时绩效看板（应用层）来实现对商务的绩效管理",
-      "status": "todo",
-      "progress": 0,
-      "notes": "",
-      "risk": false,
-      "order": 1
+      "station": "龙里中转场",
+      "region": "西南区"
+    },
+    {
+      "station": "宁波佳利燃器-开门式重力货架",
+      "region": "浙北区"
+    },
+    {
+      "station": "前海大厦顺丰总部15楼2号柜",
+      "region": "粤东区"
+    },
+    {
+      "station": "山西顺丰-重力开门柜",
+      "region": "山西区"
+    },
+    {
+      "station": "上虹货架01",
+      "region": "上海区"
+    },
+    {
+      "station": "上虹貨架02",
+      "region": "上海区"
+    },
+    {
+      "station": "顺丰创智大厦1号柜",
+      "region": "粤东区"
+    },
+    {
+      "station": "顺丰创智大厦2号柜",
+      "region": "粤东区"
+    },
+    {
+      "station": "顺丰河南郑州371W备件库",
+      "region": "河南区"
+    },
+    {
+      "station": "唐山贺祥智能科技有限公司",
+      "region": "河北区"
+    },
+    {
+      "station": "一鼎智能柜01",
+      "region": "苏南区"
+    },
+    {
+      "station": "渝北转运中心-开方式货架",
+      "region": "西南区"
     }
-  ]
+  ],
+  "snapshots": []
 }
