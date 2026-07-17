@@ -95,6 +95,14 @@
     {
       "station": "渝北转运中心-开方式货架",
       "region": "西南区"
+    },
+    {
+      "station": "苏州顺丰速运有限公司1号柜",
+      "region": ""
+    },
+    {
+      "station": "近邮科技-重力开门柜",
+      "region": ""
     }
   ],
   "snapshots": [
@@ -783,6 +791,262 @@
       ],
       "stationCount": 135,
       "totalQty": 501522
+    },
+    {
+      "id": "idmrotf4p7vopdvr",
+      "importTime": "2026-07-17T10:48:56.203Z",
+      "type": "replenish",
+      "fileName": "补货记录.xlsx",
+      "orderDate": "2026-07-01",
+      "records": [
+        {
+          "station": "上虹貨架02",
+          "qty": 25447,
+          "orderDate": "2026-07-01"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 107,
+          "orderDate": "2026-07-01"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 30265,
+          "orderDate": "2026-07-02"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 72,
+          "orderDate": "2026-07-02"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 38881,
+          "orderDate": "2026-07-03"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 1,
+          "orderDate": "2026-07-03"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 20717,
+          "orderDate": "2026-07-04"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 220,
+          "orderDate": "2026-07-06"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 25530,
+          "orderDate": "2026-07-06"
+        },
+        {
+          "station": "渝北转运中心-开方式货架",
+          "qty": 6,
+          "orderDate": "2026-07-06"
+        },
+        {
+          "station": "华东分拨中心1号柜",
+          "qty": 60,
+          "orderDate": "2026-07-07"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 33247,
+          "orderDate": "2026-07-07"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 30923,
+          "orderDate": "2026-07-08"
+        },
+        {
+          "station": "北京顺丰速运有限公司",
+          "qty": 168501,
+          "orderDate": "2026-07-08"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 20926,
+          "orderDate": "2026-07-09"
+        },
+        {
+          "station": "苏州顺丰速运有限公司1号柜",
+          "qty": 1,
+          "orderDate": "2026-07-09"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 45,
+          "orderDate": "2026-07-09"
+        },
+        {
+          "station": "华东分拨中心1号柜",
+          "qty": 24,
+          "orderDate": "2026-07-09"
+        },
+        {
+          "station": "龙里中转场",
+          "qty": 20,
+          "orderDate": "2026-07-09"
+        },
+        {
+          "station": "丹氏智能开门柜",
+          "qty": 132,
+          "orderDate": "2026-07-09"
+        },
+        {
+          "station": "丹氏智能开门柜",
+          "qty": 64933,
+          "orderDate": "2026-07-10"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 25132,
+          "orderDate": "2026-07-10"
+        },
+        {
+          "station": "山西顺丰-重力开门柜",
+          "qty": 2,
+          "orderDate": "2026-07-10"
+        },
+        {
+          "station": "顺丰河南郑州371W备件库",
+          "qty": 8,
+          "orderDate": "2026-07-10"
+        },
+        {
+          "station": "华东分拨中心1号柜",
+          "qty": 1,
+          "orderDate": "2026-07-10"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 24986,
+          "orderDate": "2026-07-11"
+        },
+        {
+          "station": "金丰速运有限公司",
+          "qty": 14,
+          "orderDate": "2026-07-11"
+        },
+        {
+          "station": "顺丰创智大厦1号柜",
+          "qty": 456,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "顺丰创智大厦2号柜",
+          "qty": 513,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 23593,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "近邮科技-重力开门柜",
+          "qty": 288,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "一鼎智能柜01",
+          "qty": 382,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "丰巢前海大厦-重力开门柜",
+          "qty": 144,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "金丰速运有限公司",
+          "qty": 22,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "顺丰河南郑州371W备件库",
+          "qty": 2,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "渝北转运中心-开方式货架",
+          "qty": 847,
+          "orderDate": "2026-07-13"
+        },
+        {
+          "station": "华东分拨中心2号柜",
+          "qty": 139,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 27449,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "昆明官渡转运中心（开放式重力货架）2号柜",
+          "qty": 14,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "宁波佳利燃器-开门式重力货架",
+          "qty": 29,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "福州顺丰转运中心",
+          "qty": 1859,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "前海大厦顺丰总部15楼2号柜",
+          "qty": 104,
+          "orderDate": "2026-07-14"
+        },
+        {
+          "station": "唐山贺祥智能科技有限公司",
+          "qty": 1846,
+          "orderDate": "2026-07-15"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 20831,
+          "orderDate": "2026-07-15"
+        },
+        {
+          "station": "近邮科技-重力开门柜",
+          "qty": 98,
+          "orderDate": "2026-07-15"
+        },
+        {
+          "station": "上虹貨架02",
+          "qty": 22513,
+          "orderDate": "2026-07-16"
+        },
+        {
+          "station": "丰巢前海大厦-重力开门柜",
+          "qty": 6,
+          "orderDate": "2026-07-16"
+        },
+        {
+          "station": "渝北转运中心-开方式货架",
+          "qty": 4,
+          "orderDate": "2026-07-16"
+        },
+        {
+          "station": "顺丰河南郑州371W备件库",
+          "qty": 2,
+          "orderDate": "2026-07-17"
+        }
+      ],
+      "stationCount": 49,
+      "totalQty": 611342
     }
   ]
 }
