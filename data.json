@@ -1,7 +1,28 @@
 {
-  "title": "MRO 产品路线图",
-  "year": 2026,
+  "projectTitle": "MRO 产品路线图",
+  "year": 2025,
   "startMonth": 6,
   "endMonth": 11,
-  "tasks": []
+  "months": ["6月", "7月", "8月", "9月", "10月", "11月"],
+  "statusLabels": {
+    "done": "已完成",
+    "wip": "进行中",
+    "todo": "待开始",
+    "risk": "有风险"
+  },
+  "tasks": [
+    { "id": "t1",  "month": 0, "title": "打通工单补货流程",   "sub": "补货能力",                       "status": "done", "progress": 100, "notes": "", "risk": false, "order": 0 },
+    { "id": "t2",  "month": 1, "title": "接入暂存柜暂存能力", "sub": "前置仓暂存能力",                 "status": "done", "progress": 100, "notes": "", "risk": false, "order": 1 },
+    { "id": "t3",  "month": 1, "title": "MRO管理系统标准化", "sub": "平云小匠、阿玛塔、东风汽车对接", "status": "wip",  "progress": 60,  "notes": "", "risk": false, "order": 2 },
+    { "id": "t4",  "month": 1, "title": "接入顺丰寄件能力",   "sub": "",                               "status": "wip",  "progress": 40,  "notes": "", "risk": false, "order": 3 },
+    { "id": "t5",  "month": 2, "title": "MRO柜接入资产管理", "sub": "资产选址、资产激活等",           "status": "todo", "progress": 15,  "notes": "", "risk": false, "order": 0 },
+    { "id": "t6",  "month": 2, "title": "外部迪卡依对接",     "sub": "",                               "status": "risk", "progress": 10,  "notes": "", "risk": true,  "order": 1 },
+    { "id": "t7",  "month": 2, "title": "MRO中台能力模块化", "sub": "存取能力",                       "status": "todo", "progress": 20,  "notes": "", "risk": false, "order": 2 },
+    { "id": "t8",  "month": 3, "title": "暂存柜柜机交互重构", "sub": "",                               "status": "todo", "progress": 0,   "notes": "", "risk": false, "order": 0 },
+    { "id": "t9",  "month": 3, "title": "客户关系管理",       "sub": "",                               "status": "todo", "progress": 0,   "notes": "", "risk": false, "order": 1 },
+    { "id": "t10", "month": 4, "title": "丰巢管家App优化",    "sub": "",                               "status": "todo", "progress": 0,   "notes": "", "risk": false, "order": 0 },
+    { "id": "t11", "month": 4, "title": "资金流水管理",        "sub": "",                              "status": "todo", "progress": 0,   "notes": "", "risk": false, "order": 1 },
+    { "id": "t12", "month": 5, "title": "CRM商机管理",         "sub": "",                              "status": "todo", "progress": 0,   "notes": "", "risk": false, "order": 0 },
+    { "id": "t13", "month": 5, "title": "丰蜜App优化",         "sub": "",                              "status": "todo", "progress": 0,   "notes": "", "risk": false, "order": 1 }
+  ]
 }
