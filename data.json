@@ -24,7 +24,7 @@
       "progress": 100,
       "notes": "",
       "risk": false,
-      "order": 1
+      "order": 0
     },
     {
       "id": "t3",
@@ -35,7 +35,7 @@
       "progress": 60,
       "notes": "",
       "risk": false,
-      "order": 2
+      "order": 1
     },
     {
       "id": "t4",
@@ -46,7 +46,7 @@
       "progress": 40,
       "notes": "",
       "risk": false,
-      "order": 0
+      "order": 2
     },
     {
       "id": "t5",
