@@ -106,8 +106,8 @@
     {
       "id": "t11",
       "month": 4,
-      "title": "资金流水管理",
-      "sub": "",
+      "title": "wms数据看板",
+      "sub": "支持用户查看仓储，柜机，客户流水等数据",
       "status": "todo",
       "progress": 0,
       "notes": "",
