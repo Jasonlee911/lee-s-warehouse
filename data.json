@@ -64,10 +64,10 @@
       "month": 2,
       "title": "外部迪卡依对接",
       "sub": "",
-      "status": "risk",
+      "status": "wip",
       "progress": 10,
-      "notes": "",
-      "risk": true,
+      "notes": "将暂存柜存取能力独立给到迪卡侬租赁业务使用",
+      "risk": false,
       "order": 1
     },
     {
