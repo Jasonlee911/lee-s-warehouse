@@ -61,14 +61,14 @@
     },
     {
       "id": "t6",
-      "month": 2,
+      "month": 1,
       "title": "外部迪卡依对接",
       "sub": "",
       "status": "wip",
       "progress": 10,
       "notes": "将暂存柜存取能力独立给到迪卡侬租赁业务使用",
       "risk": false,
-      "order": 1
+      "order": 2
     },
     {
       "id": "t7",
@@ -79,7 +79,7 @@
       "progress": 20,
       "notes": "",
       "risk": false,
-      "order": 2
+      "order": 1
     },
     {
       "id": "t8",
