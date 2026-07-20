@@ -135,6 +135,17 @@
       "notes": "",
       "risk": false,
       "order": 0
+    },
+    {
+      "id": "t1784537485979_4q8gzj",
+      "month": 5,
+      "title": "商机绩效管理",
+      "sub": "通过绩效规则引擎 (配置层)、商机全链路追踪 (数据层)、实时绩效看板 (应用层)来实现对商务的绩效管理",
+      "status": "todo",
+      "progress": 0,
+      "notes": "",
+      "risk": false,
+      "order": 1
     }
   ]
 }
