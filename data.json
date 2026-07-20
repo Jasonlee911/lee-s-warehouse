@@ -52,10 +52,10 @@
       "id": "t5",
       "month": 2,
       "title": "MRO柜接入资产管理",
-      "sub": "资产选址、资产激活等",
+      "sub": "将mro柜资产纳入到丰巢资产管理体系（mro柜选址，投放，激活全链路打通）",
       "status": "todo",
       "progress": 0,
-      "notes": "将mro柜资产纳入到丰巢资产管理体系（mro柜选址，投放，激活全链路打通）",
+      "notes": "",
       "risk": false,
       "order": 0
     },
