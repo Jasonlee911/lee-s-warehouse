@@ -63,10 +63,10 @@
       "id": "t6",
       "month": 1,
       "title": "外部迪卡依对接",
-      "sub": "",
+      "sub": "将暂存柜存取能力独立给到迪卡侬租赁业务使用",
       "status": "wip",
       "progress": 10,
-      "notes": "将暂存柜存取能力独立给到迪卡侬租赁业务使用",
+      "notes": "",
       "risk": false,
       "order": 2
     },
