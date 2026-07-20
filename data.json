@@ -22,7 +22,7 @@
       "sub": "前置仓暂存能力",
       "status": "done",
       "progress": 100,
-      "notes": "",
+      "notes": "将存取能力接入到mro中台，支持物流配送至暂存柜作为mro前置仓使用",
       "risk": false,
       "order": 1
     },
