@@ -93,17 +93,6 @@
       "order": 0
     },
     {
-      "id": "t9",
-      "month": 3,
-      "title": "客户关系管理",
-      "sub": "",
-      "status": "todo",
-      "progress": 0,
-      "notes": "",
-      "risk": false,
-      "order": 1
-    },
-    {
       "id": "t10",
       "month": 4,
       "title": "丰巢管家App优化",
