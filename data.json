@@ -41,10 +41,10 @@
       "id": "t4",
       "month": 1,
       "title": "接入顺丰寄件能力",
-      "sub": "",
+      "sub": "全链路补齐平台对接物流发货能力（路由轨迹跟踪）",
       "status": "wip",
       "progress": 40,
-      "notes": "全链路补齐平台对接物流发货能力（路由轨迹跟踪）",
+      "notes": "",
       "risk": false,
       "order": 1
     },
