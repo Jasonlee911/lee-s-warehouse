@@ -19,10 +19,10 @@
       "id": "t2",
       "month": 0,
       "title": "接入暂存柜暂存能力",
-      "sub": "前置仓暂存能力",
+      "sub": "将存取能力接入到mro中台，支持物流配送至暂存柜作为mro前置仓使用",
       "status": "done",
       "progress": 100,
-      "notes": "将存取能力接入到mro中台，支持物流配送至暂存柜作为mro前置仓使用",
+      "notes": "",
       "risk": false,
       "order": 1
     },
