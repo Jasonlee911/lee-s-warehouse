@@ -30,10 +30,10 @@
       "id": "t3",
       "month": 1,
       "title": "MRO管理系统标准化",
-      "sub": "平云小匠、阿玛塔、东风汽车对接",
+      "sub": "mro全链路功能（sku管理，补货，领料，人员管理）接口化，并支持在丰巢mro管理后台查看数据",
       "status": "wip",
       "progress": 60,
-      "notes": "mro全链路功能（sku管理，补货，领料，人员管理）接口化，并支持在丰巢mro管理后台查看数据",
+      "notes": "",
       "risk": false,
       "order": 0
     },
