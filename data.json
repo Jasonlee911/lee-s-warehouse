@@ -33,7 +33,7 @@
       "sub": "mro全链路功能（sku管理，补货，领料，人员管理）接口化，并支持在丰巢mro管理后台查看数据",
       "status": "wip",
       "progress": 60,
-      "notes": "",
+      "notes": "7月28日上线（覆盖平云小匠、阿玛塔）",
       "risk": false,
       "order": 0
     },
