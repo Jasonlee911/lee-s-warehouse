@@ -68,7 +68,7 @@
       "progress": 10,
       "notes": "8月中下旬上线",
       "risk": false,
-      "order": 2
+      "order": 1
     },
     {
       "id": "t7",
@@ -79,7 +79,7 @@
       "progress": 0,
       "notes": "",
       "risk": false,
-      "order": 1
+      "order": 2
     },
     {
       "id": "t8",
