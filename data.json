@@ -146,6 +146,17 @@
       "notes": "",
       "risk": false,
       "order": 1
+    },
+    {
+      "id": "t1784888721245_4jznil",
+      "month": 2,
+      "title": "江西民生柜项目",
+      "sub": "搭建客户进销存管理系统、丰巢存包柜接入零售能力（免费领用、现售、预售）、扫码补货、扫码取件",
+      "status": "wip",
+      "progress": 7,
+      "notes": "",
+      "risk": false,
+      "order": 3
     }
   ]
 }
