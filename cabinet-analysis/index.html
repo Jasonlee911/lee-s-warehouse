@@ -470,7 +470,7 @@
             </label>
             <label class="field">
               <span class="lbl">数据文件路径</span>
-              <input type="text" id="ghPath" value="data.json">
+              <input type="text" id="ghPath" value="cabinet-analysis/data.json">
             </label>
             <label class="field">
               <span class="lbl">分支</span>
@@ -1487,7 +1487,7 @@
   function ghSettings(){
     const s = loadGhSettings();
     if(!s.token || !s.repo) return null;
-    return { token:s.token, repo:s.repo, path:s.path||'data.json', branch:s.branch||'main' };
+    return { token:s.token, repo:s.repo, path:s.path||'cabinet-analysis/data.json', branch:s.branch||'main' };
   }
 
   function ghStatus(kind, msg){
@@ -1588,7 +1588,7 @@
   async function ghConnect(){
     const token = document.getElementById('ghToken').value.trim();
     const repo = document.getElementById('ghRepo').value.trim();
-    const path = document.getElementById('ghPath').value.trim() || 'data.json';
+    const path = document.getElementById('ghPath').value.trim() || 'cabinet-analysis/data.json';
     const branch = document.getElementById('ghBranch').value.trim() || 'main';
     if(!token || !repo) { ghStatus('err','请填写 Token 和仓库名'); return; }
     if(!repo.includes('/')) { ghStatus('err','仓库格式：用户名/仓库名'); return; }
@@ -1645,7 +1645,7 @@
     // fill form
     document.getElementById('ghToken').value = s.token || '';
     document.getElementById('ghRepo').value = s.repo || '';
-    document.getElementById('ghPath').value = s.path || 'data.json';
+    document.getElementById('ghPath').value = s.path || 'cabinet-analysis/data.json';
     document.getElementById('ghBranch').value = s.branch || 'main';
 
     // verify and connect
@@ -1688,7 +1688,7 @@
     const s = ghSettings();
     document.getElementById('ghToken').value = s.token || '';
     document.getElementById('ghRepo').value = s.repo || '';
-    document.getElementById('ghPath').value = s.path || 'data.json';
+    document.getElementById('ghPath').value = s.path || 'cabinet-analysis/data.json';
     document.getElementById('ghBranch').value = s.branch || 'main';
 
     if(ghConnected){
