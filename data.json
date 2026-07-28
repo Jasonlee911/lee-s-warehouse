@@ -168,6 +168,17 @@
       "notes": "",
       "risk": false,
       "order": 3
+    },
+    {
+      "id": "t1785235960567_2fl4bo",
+      "month": 2,
+      "title": "MRO管理系统标准化二期",
+      "sub": "sku管理，仓储数据查询接口化，进一步满足客户诉求",
+      "status": "wip",
+      "progress": 50,
+      "notes": "预估8月中旬上线",
+      "risk": false,
+      "order": 4
     }
   ]
 }
