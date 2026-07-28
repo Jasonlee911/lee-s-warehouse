@@ -93,17 +93,6 @@
       "order": 0
     },
     {
-      "id": "t10",
-      "month": 4,
-      "title": "mro客户管理平台",
-      "sub": "统一对外的管理平台，客户可在此平台进行wms相关操作（sku管理，上下架管理，补货领料管理，物流管理）",
-      "status": "todo",
-      "progress": 0,
-      "notes": "",
-      "risk": false,
-      "order": 0
-    },
-    {
       "id": "t11",
       "month": 5,
       "title": "wms数据看板",
