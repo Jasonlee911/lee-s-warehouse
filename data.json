@@ -1,7 +1,184 @@
 {
   "title": "MRO 产品路线图",
-  "year": 2026,
+  "year": 2025,
   "startMonth": 6,
   "endMonth": 11,
-  "tasks": []
+  "tasks": [
+    {
+      "id": "t1",
+      "month": 0,
+      "title": "打通工单补货流程",
+      "sub": "将宸沣补货信息打通至丰巢工单系统，把控丰巢运维通过丰蜜补货流程",
+      "status": "done",
+      "progress": 100,
+      "notes": "6月23日上线",
+      "risk": false,
+      "order": 0
+    },
+    {
+      "id": "t2",
+      "month": 0,
+      "title": "接入暂存柜暂存能力",
+      "sub": "将存取能力接入到mro中台，支持物流配送至暂存柜作为mro前置仓使用",
+      "status": "done",
+      "progress": 100,
+      "notes": "6月30日上线",
+      "risk": false,
+      "order": 1
+    },
+    {
+      "id": "t3",
+      "month": 1,
+      "title": "MRO管理系统标准化",
+      "sub": "mro全链路功能（sku管理，补货，领料，人员管理）接口化，并支持在丰巢mro管理后台查看数据",
+      "status": "wip",
+      "progress": 60,
+      "notes": "7月28日上线（覆盖平云小匠、阿玛塔）",
+      "risk": false,
+      "order": 0
+    },
+    {
+      "id": "t4",
+      "month": 1,
+      "title": "接入顺丰寄件能力",
+      "sub": "全链路补齐平台对接物流发货能力（路由轨迹跟踪）",
+      "status": "wip",
+      "progress": 40,
+      "notes": "7月21日上线",
+      "risk": false,
+      "order": 1
+    },
+    {
+      "id": "t5",
+      "month": 2,
+      "title": "MRO柜接入资产管理",
+      "sub": "将mro柜资产纳入到丰巢资产管理体系（mro柜选址，投放，激活全链路打通）",
+      "status": "todo",
+      "progress": 0,
+      "notes": "8月中旬上线",
+      "risk": false,
+      "order": 0
+    },
+    {
+      "id": "t6",
+      "month": 2,
+      "title": "外部迪卡依对接",
+      "sub": "将暂存柜存取能力独立给到迪卡侬租赁业务使用",
+      "status": "wip",
+      "progress": 10,
+      "notes": "8月中下旬上线",
+      "risk": false,
+      "order": 1
+    },
+    {
+      "id": "t7",
+      "month": 4,
+      "title": "MRO中台能力模块化",
+      "sub": "将暂存柜存取能力、补货能力、物流配送能力模块化输出，供客户选择",
+      "status": "todo",
+      "progress": 0,
+      "notes": "",
+      "risk": false,
+      "order": 2
+    },
+    {
+      "id": "t8",
+      "month": 3,
+      "title": "账单管理",
+      "sub": "将柜机采购，sku采购，mro柜机分成形成定期账单，并支持自动对账功能",
+      "status": "todo",
+      "progress": 0,
+      "notes": "",
+      "risk": false,
+      "order": 0
+    },
+    {
+      "id": "t10",
+      "month": 4,
+      "title": "mro客户管理平台",
+      "sub": "统一对外的管理平台，客户可在此平台进行wms相关操作（sku管理，上下架管理，补货领料管理，物流管理）",
+      "status": "todo",
+      "progress": 0,
+      "notes": "",
+      "risk": false,
+      "order": 0
+    },
+    {
+      "id": "t11",
+      "month": 5,
+      "title": "wms数据看板",
+      "sub": "支持用户查看仓储，柜机，客户流水等数据",
+      "status": "todo",
+      "progress": 0,
+      "notes": "",
+      "risk": false,
+      "order": 1
+    },
+    {
+      "id": "t12",
+      "month": 3,
+      "title": "CRM商机管理",
+      "sub": "支持商机录入，跟进，完成全流程线上化，并将后续进件，合同签署与归档线上化",
+      "status": "todo",
+      "progress": 0,
+      "notes": "",
+      "risk": false,
+      "order": 1
+    },
+    {
+      "id": "t13",
+      "month": 5,
+      "title": "成本透视看板",
+      "sub": "通过bi成本看板，看透成本结构。能清楚看到哪个部门、哪条产线、甚至哪个工人花了多少钱，直接对应“降本增效”。",
+      "status": "todo",
+      "progress": 0,
+      "notes": "",
+      "risk": false,
+      "order": 0
+    },
+    {
+      "id": "t1784537485979_4q8gzj",
+      "month": 5,
+      "title": "商机绩效管理",
+      "sub": "通过绩效规则引擎 (配置层)、商机全链路追踪 (数据层)、实时绩效看板 (应用层)来实现对商务的绩效管理",
+      "status": "todo",
+      "progress": 0,
+      "notes": "",
+      "risk": false,
+      "order": 1
+    },
+    {
+      "id": "t1784888721245_4jznil",
+      "month": 2,
+      "title": "江西民生柜项目",
+      "sub": "搭建客户进销存管理系统、丰巢存包柜接入零售能力（免费领用、现售、预售）、扫码补货、扫码取件",
+      "status": "wip",
+      "progress": 7,
+      "notes": "",
+      "risk": false,
+      "order": 3
+    },
+    {
+      "id": "t1784888928328_zsll9x",
+      "month": 3,
+      "title": "MRO客户管理系统",
+      "sub": "搭建丰巢自有的MRO柜进销存管理系统，提供给外部供应商/客户使用；（含设备管理、商品SKU管理、货道库存管理、上架管理、补货单管理、公司部门管理、用户管理、角色管理等）",
+      "status": "todo",
+      "progress": 0,
+      "notes": "",
+      "risk": false,
+      "order": 3
+    },
+    {
+      "id": "t1784888984896_u1662u",
+      "month": 4,
+      "title": "丰巢客户/供应商微信小程序工具",
+      "sub": "",
+      "status": "todo",
+      "progress": 0,
+      "notes": "",
+      "risk": false,
+      "order": 3
+    }
+  ]
 }
