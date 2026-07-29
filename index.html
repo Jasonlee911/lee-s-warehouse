@@ -82,6 +82,14 @@
   .col-cards { padding: 0 6px; border-right: 1px dashed #E2E1DC; padding-bottom: 12px; min-height: 60px; }
   .col-cards:last-child, .col-header:last-child { border-right: none; }
   .col-cards.drag-hover { background: #F8F7FF; }
+  .month-theme-wrap { margin: 0 6px 10px; }
+  .month-theme { font-size: 11px; font-weight: 600; color: #3D30C4; background: #F0EEFF; border: 1.5px dashed transparent; border-radius: 7px; padding: 5px 8px; min-height: 15px; line-height: 1.4; cursor: text; outline: none; transition: border-color 0.15s, background 0.15s; word-break: break-word; }
+  .month-theme:hover { border-color: #C5BDFF; }
+  .month-theme:focus { border-color: #5B4EE8; background: white; }
+  .month-theme:empty:before { content: attr(data-placeholder); color: #A79BE8; font-weight: 500; }
+  .exporting .month-theme { border-color: transparent !important; cursor: default; }
+  .exporting .month-theme:empty { padding: 0; min-height: 0; }
+  .exporting .month-theme:empty:before { content: none; }
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1A1918; color: white; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 999; }
   .toast.show { opacity: 1; }
   .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1000; display: flex; align-items: center; justify-content: center; }
@@ -231,6 +239,7 @@ const STATUS_CLASS = { done:'s-done',  wip:'s-wip',  todo:'s-todo',  risk:'s-ris
 
 let year = 2025, startMonth = 6, endMonth = 11, months = [];
 let tasks = [], activeId = null, editId = null;
+let monthThemes = {};
 let draggedTaskId = null;
 let fileSha = null;
 let saveTimer = null;
@@ -347,12 +356,14 @@ function buildData() {
   return {
     title: document.getElementById('projectTitle').textContent.trim() || 'MRO 产品路线图',
     year: year, startMonth: startMonth, endMonth: endMonth,
-    tasks: JSON.parse(JSON.stringify(tasks))
+    tasks: JSON.parse(JSON.stringify(tasks)),
+    monthThemes: JSON.parse(JSON.stringify(monthThemes))
   };
 }
 
 function applyData(d) {
   if (d.tasks && Array.isArray(d.tasks)) tasks = d.tasks;
+  if (d.monthThemes && typeof d.monthThemes === 'object') monthThemes = d.monthThemes;
   if (d.title) { document.getElementById('projectTitle').textContent = d.title; document.title = d.title; }
   if (d.year)       { year = d.year;             document.getElementById('yearInput').value = year; }
   if (d.startMonth) { startMonth = d.startMonth; document.getElementById('startMonthInput').value = startMonth; }
@@ -472,7 +483,13 @@ function renderCards() {
   cols.forEach(function(col) { col.sort(function(a,b) { return (a.order||0)-(b.order||0); }); });
   document.getElementById('cardsGrid').style.gridTemplateColumns = 'repeat(' + numCols + ', 1fr)';
   document.getElementById('cardsGrid').innerHTML = cols.map(function(col, mi) {
+    var theme = monthThemes[mi] || '';
     return '<div><div class="col-header">' + months[mi] + '</div>' +
+      '<div class="month-theme-wrap"><div class="month-theme" contenteditable="true" spellcheck="false"' +
+      ' data-placeholder="+ 设置本月主题" data-month="' + mi + '"' +
+      ' onblur="onThemeBlur(this,' + mi + ')"' +
+      ' onclick="event.stopPropagation()"' +
+      ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();}">' + theme + '</div></div>' +
       '<div class="col-cards" id="col_' + mi + '"' +
       ' ondragover="onColDragOver(event,' + mi + ')"' +
       ' ondragleave="onColDragLeave(event,' + mi + ')"' +
@@ -480,6 +497,13 @@ function renderCards() {
       col.map(cardHTML).join('') +
       '</div></div>';
   }).join('');
+}
+
+function onThemeBlur(el, mi) {
+  var text = el.textContent.trim();
+  el.textContent = text;
+  if (text) monthThemes[mi] = text; else delete monthThemes[mi];
+  save();
 }
 
 function renderAll() { renderAxis(); renderSummary(); renderCards(); }
