@@ -145,7 +145,7 @@
       "progress": 0,
       "notes": "",
       "risk": false,
-      "order": 3
+      "order": 2
     },
     {
       "id": "t1784888984896_u1662u",
@@ -167,18 +167,18 @@
       "progress": 10,
       "notes": "预估8月中旬上线",
       "risk": false,
-      "order": 4
+      "order": 2
     },
     {
       "id": "t1785468128635_mok5ih",
-      "month": 3,
+      "month": 2,
       "title": "接入顺丰寄件能力二期",
       "sub": "支持修改送货地址，卡单人工处理",
       "status": "todo",
       "progress": 0,
       "notes": "",
       "risk": false,
-      "order": 4
+      "order": 3
     }
   ],
   "monthThemes": {
