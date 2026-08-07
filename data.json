@@ -174,8 +174,8 @@
       "month": 2,
       "title": "接入顺丰寄件能力二期",
       "sub": "支持修改送货地址，卡单人工处理",
-      "status": "todo",
-      "progress": 0,
+      "status": "wip",
+      "progress": 12,
       "notes": "",
       "risk": false,
       "order": 3
