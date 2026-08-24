@@ -138,14 +138,14 @@
     },
     {
       "id": "t1784888928328_zsll9x",
-      "month": 3,
+      "month": 2,
       "title": "MRO客户管理系统",
       "sub": "搭建丰巢自有的MRO柜进销存管理系统，提供给外部供应商/客户使用；（含设备管理、商品SKU管理、货道库存管理、上架管理、补货单管理、公司部门管理、用户管理、角色管理等）",
       "status": "todo",
       "progress": 0,
       "notes": "",
       "risk": false,
-      "order": 2
+      "order": 3
     },
     {
       "id": "t1784888984896_u1662u",
@@ -178,7 +178,7 @@
       "progress": 12,
       "notes": "",
       "risk": false,
-      "order": 3
+      "order": 2
     }
   ],
   "monthThemes": {
