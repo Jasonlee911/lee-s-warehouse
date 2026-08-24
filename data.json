@@ -53,9 +53,9 @@
       "month": 2,
       "title": "MRO柜接入资产管理",
       "sub": "将mro柜资产纳入到丰巢资产管理体系（mro柜选址，投放，激活全链路打通）",
-      "status": "wip",
-      "progress": 60,
-      "notes": "8月中旬上线",
+      "status": "done",
+      "progress": 100,
+      "notes": "0819上线",
       "risk": false,
       "order": 0
     },
