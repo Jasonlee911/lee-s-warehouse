@@ -83,14 +83,14 @@
     },
     {
       "id": "t8",
-      "month": 3,
+      "month": 4,
       "title": "账单管理",
       "sub": "将柜机采购，sku采购，mro柜机分成形成定期账单，并支持自动对账功能",
       "status": "todo",
       "progress": 0,
       "notes": "",
       "risk": false,
-      "order": 1
+      "order": 2
     },
     {
       "id": "t11",
@@ -178,7 +178,7 @@
       "progress": 12,
       "notes": "",
       "risk": false,
-      "order": 3
+      "order": 1
     },
     {
       "id": "t1787708338208_bbe7uj",
