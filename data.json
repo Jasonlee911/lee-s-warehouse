@@ -94,7 +94,7 @@
     },
     {
       "id": "t11",
-      "month": 5,
+      "month": 6,
       "title": "wms数据看板",
       "sub": "支持用户查看仓储，柜机，客户流水等数据",
       "status": "todo",
@@ -112,7 +112,7 @@
       "progress": 0,
       "notes": "",
       "risk": false,
-      "order": 2
+      "order": 0
     },
     {
       "id": "t13",
