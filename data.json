@@ -90,7 +90,7 @@
       "progress": 0,
       "notes": "",
       "risk": false,
-      "order": 3
+      "order": 2
     },
     {
       "id": "t11",
@@ -112,7 +112,7 @@
       "progress": 0,
       "notes": "",
       "risk": false,
-      "order": 0
+      "order": 3
     },
     {
       "id": "t13",
@@ -145,7 +145,7 @@
       "progress": 0,
       "notes": "一期上线补货领料相关功能，及柜机物料数据看板功能",
       "risk": false,
-      "order": 2
+      "order": 1
     },
     {
       "id": "t1784888984896_u1662u",
@@ -178,7 +178,7 @@
       "progress": 12,
       "notes": "",
       "risk": false,
-      "order": 1
+      "order": 0
     }
   ],
   "monthThemes": {
