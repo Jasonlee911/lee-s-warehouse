@@ -112,7 +112,7 @@
       "progress": 0,
       "notes": "",
       "risk": false,
-      "order": 0
+      "order": 2
     },
     {
       "id": "t13",
@@ -123,7 +123,7 @@
       "progress": 0,
       "notes": "",
       "risk": false,
-      "order": 2
+      "order": 1
     },
     {
       "id": "t1784537485979_4q8gzj",
@@ -200,7 +200,7 @@
       "progress": 0,
       "notes": "完善管理系统高阶功能，例如货道预警，异常补货&领料记录及处理；借还功能上线。",
       "risk": false,
-      "order": 1
+      "order": 0
     }
   ],
   "monthThemes": {
