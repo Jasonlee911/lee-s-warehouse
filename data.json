@@ -190,6 +190,17 @@
       "notes": "在一期基础上，完善柜机货架、商品管理、人员管理功能，实现补货领料全链路可在SAAS系统操作",
       "risk": false,
       "order": 0
+    },
+    {
+      "id": "t1787708425279_ukreta",
+      "month": 5,
+      "title": "MRO客户管理系统SAAS三期",
+      "sub": "",
+      "status": "todo",
+      "progress": 0,
+      "notes": "",
+      "risk": false,
+      "order": 2
     }
   ],
   "monthThemes": {
