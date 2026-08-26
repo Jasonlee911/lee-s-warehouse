@@ -141,8 +141,8 @@
       "month": 3,
       "title": "MRO客户管理系统SAAS",
       "sub": "搭建丰巢自有的MRO柜进销存管理系统，提供给外部客户使用；",
-      "status": "todo",
-      "progress": 0,
+      "status": "wip",
+      "progress": 3,
       "notes": "一期上线补货领料相关功能，及柜机物料数据看板功能",
       "risk": false,
       "order": 0
