@@ -79,7 +79,7 @@
       "progress": 0,
       "notes": "",
       "risk": false,
-      "order": 2
+      "order": 1
     },
     {
       "id": "t8",
@@ -156,7 +156,7 @@
       "progress": 0,
       "notes": "",
       "risk": false,
-      "order": 0
+      "order": 2
     },
     {
       "id": "t1785235960567_2fl4bo",
@@ -189,7 +189,7 @@
       "progress": 0,
       "notes": "在一期基础上，完善柜机货架、商品管理、人员管理功能，实现补货领料全链路可在SAAS系统操作",
       "risk": false,
-      "order": 1
+      "order": 0
     }
   ],
   "monthThemes": {
