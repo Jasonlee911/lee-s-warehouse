@@ -195,10 +195,10 @@
       "id": "t1787708425279_ukreta",
       "month": 5,
       "title": "MRO客户管理系统SAAS三期",
-      "sub": "",
+      "sub": "针对SAAS管理系统二期的迭代",
       "status": "todo",
       "progress": 0,
-      "notes": "",
+      "notes": "完善管理系统高阶功能，例如货道预警，异常补货&领料记录及处理；借还功能上线。",
       "risk": false,
       "order": 2
     }
