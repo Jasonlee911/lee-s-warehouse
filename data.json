@@ -174,8 +174,8 @@
       "month": 3,
       "title": "op运营管理后台--接入顺丰寄件能力二期",
       "sub": "支持修改送货地址，卡单人工处理",
-      "status": "wip",
-      "progress": 12,
+      "status": "done",
+      "progress": 100,
       "notes": "",
       "risk": false,
       "order": 0
