@@ -212,6 +212,17 @@
       "notes": "9月22上线",
       "risk": false,
       "order": 2
+    },
+    {
+      "id": "t1793590406956_v6awoz",
+      "month": 5,
+      "title": "资产管理系统二期",
+      "sub": "支持拆移撤",
+      "status": "wip",
+      "progress": 50,
+      "notes": "",
+      "risk": false,
+      "order": 4
     }
   ],
   "monthThemes": {
