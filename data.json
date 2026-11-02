@@ -61,14 +61,14 @@
     },
     {
       "id": "t6",
-      "month": 2,
+      "month": 3,
       "title": "外部迪卡依对接",
       "sub": "将暂存柜存取能力独立给到迪卡侬租赁业务使用",
       "status": "wip",
       "progress": 88,
       "notes": "8月中下旬上线",
       "risk": false,
-      "order": 1
+      "order": 3
     },
     {
       "id": "t7",
