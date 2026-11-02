@@ -138,14 +138,14 @@
     },
     {
       "id": "t1784888928328_zsll9x",
-      "month": 5,
+      "month": 4,
       "title": "MRO客户管理系统SAAS一期",
       "sub": "搭建丰巢自有的MRO柜进销存管理系统，提供给外部客户使用；",
       "status": "wip",
       "progress": 10,
       "notes": "",
       "risk": false,
-      "order": 3
+      "order": 1
     },
     {
       "id": "t1784888984896_u1662u",
@@ -189,7 +189,7 @@
       "progress": 0,
       "notes": "在一期基础上，完善柜机货架、商品管理、人员管理功能，实现补货领料全链路可在SAAS系统操作",
       "risk": false,
-      "order": 4
+      "order": 3
     },
     {
       "id": "t1787708425279_ukreta",
