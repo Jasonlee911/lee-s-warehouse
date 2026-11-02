@@ -79,7 +79,7 @@
       "progress": 0,
       "notes": "",
       "risk": false,
-      "order": 1
+      "order": 0
     },
     {
       "id": "t8",
@@ -182,14 +182,14 @@
     },
     {
       "id": "t1787708338208_bbe7uj",
-      "month": 4,
+      "month": 5,
       "title": "MRO客户管理系统SAAS二期",
       "sub": "针对SAAS管理系统一期的迭代",
       "status": "todo",
       "progress": 0,
       "notes": "在一期基础上，完善柜机货架、商品管理、人员管理功能，实现补货领料全链路可在SAAS系统操作",
       "risk": false,
-      "order": 0
+      "order": 4
     },
     {
       "id": "t1787708425279_ukreta",
