@@ -201,6 +201,17 @@
       "notes": "完善管理系统高阶功能，例如货道预警，异常补货&领料记录及处理；借还功能上线。",
       "risk": false,
       "order": 0
+    },
+    {
+      "id": "t1793590119822_dqz6ql",
+      "month": 3,
+      "title": "迪卡侬二期",
+      "sub": "租赁系统对接存取能力",
+      "status": "done",
+      "progress": 100,
+      "notes": "9月22号上线",
+      "risk": false,
+      "order": 2
     }
   ],
   "monthThemes": {
